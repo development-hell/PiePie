@@ -1,0 +1,7 @@
+[project]
+name = "PiePie"
+version = "0.1.0"
+description = "**PiePie** is a networked personal finance app unifying expense tracking and shared ledgers. Built on Django and React, its "Unified Entity Model" treats accounts, contacts, and friends as entities within a chat-centric interface, seamlessly managing solo and social transactions."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []

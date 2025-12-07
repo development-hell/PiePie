@@ -1,0 +1,50 @@
+# ==============================
+# Root .gitignore for PiePie
+# ==============================
+
+# ---- Common environment / secrets ----
+.env
+.env.*
+!.env.example
+*.env.local
+
+# ---- Logs ----
+*.log
+logs/
+*.out
+*.err
+
+# ---- IDE / Editor configs ----
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# ---- OS / System ----
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---- Docker volumes / data ----
+data/
+db_data/
+redis_data/
+tmp/
+*.pid
+*.seed
+*.tar
+
+# ---- Global Python / Node caches ----
+__pycache__/
+*.pyc
+node_modules/
+
+# ---- Backup / temp files ----
+*.bak
+*.tmp
+*.swp
+*.swo
+*~
+
+1.md
