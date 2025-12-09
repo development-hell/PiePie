@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Navigate } from "react-router-dom";
+import { PublicLayout } from "@/components/layout/PublicLayout";
+import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
+import { LandingPage } from "@/pages/LandingPage";
+import { LoginPage } from "@/features/Auth/pages/LoginPage";
+import { RegisterPage } from "@/features/Auth/pages/RegisterPage";
+import { RequireAuth, PublicOnly } from "@/components/RouteGuards";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      {/* Public Routes (Accessible to everyone, but auth pages divert if logged in) */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        
+        {/* Only allow access if NOT logged in */}
+        <Route element={<PublicOnly />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+      </Route>
+
+      {/* Protected Routes (Require Login) */}
+      <Route element={<RequireAuth />}>
+        <Route path="/app" element={<ProtectedLayout />}>
+          <Route index element={<Navigate to="/app/chats" replace />} />
+          <Route path="chats" element={<div className="p-4">Chats Placeolder</div>} />
+          <Route path="contacts" element={<div className="p-4">Contacts Placeholder</div>} />
+          <Route path="settings" element={<div className="p-4">Settings Placeholder</div>} />
+        </Route>
+      </Route>
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

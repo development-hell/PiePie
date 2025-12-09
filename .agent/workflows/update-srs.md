@@ -49,4 +49,5 @@ Ensure the content adheres to this schema. If updating, slot new information int
 * **Merge Strategy:**
     * Keep existing text that is still valid.
     * Only rewrite sections that are affected by the new information.
+    * Make sure that whole project can be recreated with SRS.
     * *Example:* If the user says "Change database to PostgreSQL," only update the "Technology Stack" section. Leave the "User Stories" alone.
