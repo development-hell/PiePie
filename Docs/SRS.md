@@ -29,7 +29,11 @@ PiePie will allow users to manage all money movements as transactions between en
 ### 3.1 UI/UX Specifications
 The application is divided into two distinct zones with specific layouts:
 1.  **Public Zone (PublicLayout)**: Accessible to everyone (Landing Page, Auth). Contains Navbar (Logo + Theme Toggle, Login/Get Started or "Go to App" if logged in) and Footer.
-2.  **Private App Zone (ProtectedLayout)**: A chat-centric, Telegram-Web-like interface for logged-in users. Contains Navbar (Logo + Theme Toggle + **Profile Dropdown**), **Sidebar** (for navigation), and Footer (optional).
+2.  **Private App Zone (ProtectedLayout)**: A chat-centric, Telegram-Web-like interface for logged-in users.
+    *   **Layout Behavior**: Uses a **Full Width** container (`w-full`) with fixed side margins (`px-4`) on all devices (no max-width cap).
+    *   **Navbar**: Contains Logo, Theme Toggle, and **Profile Dropdown** (with Settings/Logout).
+    *   **Sidebar**: Collapsible drawer on mobile (Hamburger toggle), Sticky/Fixed on Desktop.
+    *   **Footer**: Positioned within the scrollable content area (right side), appearing at the bottom of content or screen.
 
 **Theme Support**:
 *   **Light/Dark Mode**: The application will support both light and dark themes.

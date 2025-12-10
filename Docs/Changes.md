@@ -1,5 +1,15 @@
 # Changelog
 
+## [2025-12-10 14:02] feat(ui): improve responsive layout & documentation
+**Summary:** Refined the application layout for better responsiveness and usability. Key improvements include a Mobile Sidebar (Drawer) toggle, Full-Width Desktop Layout (removing max-width boundaries), and Fixed/Scrollable Footer positioning. Also synchronized the `README.md` and `SRS.md` documenation with the latest codebase state.
+**Files Changed:**
+* `frontend/src/components/layout/Navbar.tsx`: Added `Menu` toggle for mobile and removed max-width constraints.
+* `frontend/src/components/layout/Sidebar.tsx`: Implemented Mobile Drawer pattern with `isOpen` control.
+* `frontend/src/components/layout/ProtectedLayout.tsx`: Updated layout logic for Sidebar states, Full-Width container, and Footer positioning (content-relative).
+* `frontend/src/lib/utils.ts`: Added `cn` utility for Tailwind class merging.
+* `Docs/SRS.md`: Updated Layout specs, Responsive behaviors, and UI/UX requirements.
+* `README.md`: Updated with accurate Project Tech Stack (Django 5/React 19), Setup Instructions, and Architecture overview.
+
 ## [2025-12-10 00:55] feat: implement complete auth system & frontend foundation
 **Summary:** Implemented the complete end-to-end Authentication system and established the core Frontend architecture. This massive update includes the transition to **JWT Authentication**, creation of the Custom User Model, full Login/Registration UI, Route Protection, and the main Application Layouts (Sidebar, Navbar with Profile Dropdown).
 **Backend Changes:**
