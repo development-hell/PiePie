@@ -8,19 +8,19 @@ export function ProtectedLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface text-text">
+    <div className="h-[99vh] flex flex-col bg-surface text-text">
       <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
-      <div className="flex flex-1 w-full px-4 h-[calc(100vh-4rem)] overflow-hidden">
+      <div className="flex flex-1 w-full px-0 h-[68vh] overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        <div className="flex-1 flex flex-col h-full">
-          <main className="flex-1 p-4 md:p-6 pb-6 overflow-y-auto min-h-[calc(100vh-8rem)]">
-            <Outlet />
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          <main className="flex-1 h-[80vh] overflow-y-auto no-scrollbar">
+            <div className="p-4 pb-8">
+              <Outlet />
+            </div>
           </main>
-          <div className="p-4 md:p-0">
-            <Footer />
-          </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

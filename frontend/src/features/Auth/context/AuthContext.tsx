@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,12 +69,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
     try {
       await authApi.logout();
       setUser(null);
     } catch (err) {
       console.error("Logout failed", err);
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      setUser(null);
+      // setIsLoading(false);
+    }
+  };
+
+  const updateProfile = async (data: Partial<User>) => {
+    setIsLoading(true);
+    try {
+      const updatedUser = await authApi.updateProfile(data);
+      setUser(updatedUser);
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Profile update failed");
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -89,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         checkAuth,
+        updateProfile,
       }}
     >
       {children}

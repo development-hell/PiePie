@@ -23,4 +23,16 @@ export const authApi = {
     const response = await api.get<User>("/auth/user/");
     return response.data;
   },
+  updateProfile: async (data: Partial<User>) => {
+    const response = await api.patch<User>("/auth/user/", data);
+    return response.data;
+  },
+  updateEmail: async () => {
+    const response = await api.put("/auth/update-email/");
+    return response.data;
+  },
+  updatePhone: async () => {
+    const response = await api.put("/auth/update-phone/");
+    return response.data;
+  },
 };

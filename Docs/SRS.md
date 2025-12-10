@@ -1,6 +1,6 @@
 # PiePie - Software Requirements Specification (SRS)
-**Version**: 0.1.4 (Living Document)
-**Date**: December 8, 2025
+**Version**: 0.2.0 (Living Document)
+**Date**: December 10, 2025
 **Project Owner**: Kishan Dev
 
 ## 1. Introduction
@@ -19,21 +19,28 @@ PiePie will allow users to manage all money movements as transactions between en
 
 ### 2.2 User Stories
 *   "As a user, I want to register and login so that my financial data is private and secure."
+*   "As a user, I want to manage my profile details (Name, Photo) while keeping sensitive info (Email, Phone) secure."
 *   "As a user, I want to find and connect with other users (friends) on the platform to start sharing expenses."
 *   "As a user, I want to record a transaction where I pay a merchant, so I can track my spending."
 *   "As a user, I want to split a bill with a friend, so the app tracks who owes what."
 *   "As a user, I want to see a chat-like history of transactions with a specific contact or group."
-*   "As a user, I want to move money from my Bank Account to my Cash Wallet and have it reflected in my balances."
 
 ## 3. Functional Requirements (The "How")
 ### 3.1 UI/UX Specifications
 The application is divided into two distinct zones with specific layouts:
-1.  **Public Zone (PublicLayout)**: Accessible to everyone (Landing Page, Auth). Contains Navbar (Logo + Theme Toggle, Login/Get Started or "Go to App" if logged in) and Footer.
+1.  **Public Zone (PublicLayout)**: Accessible to everyone (Landing Page, Auth). Contains Navbar and Footer.
 2.  **Private App Zone (ProtectedLayout)**: A chat-centric, Telegram-Web-like interface for logged-in users.
-    *   **Layout Behavior**: Uses a **Full Width** container (`w-full`) with fixed side margins (`px-4`) on all devices (no max-width cap).
-    *   **Navbar**: Contains Logo, Theme Toggle, and **Profile Dropdown** (with Settings/Logout).
-    *   **Sidebar**: Collapsible drawer on mobile (Hamburger toggle), Sticky/Fixed on Desktop.
-    *   **Footer**: Positioned within the scrollable content area (right side), appearing at the bottom of content or screen.
+    *   **App Shell Structure**: `h-screen` Flex Column.
+        *   **Top**: Navbar (Logo, Theme Toggle, Profile Dropdown).
+        *   **Middle**: Flex Row containing Sidebar and Main Content.
+        *   **Bottom**: Full-width Footer.
+    *   **Sidebar**:
+        *   **Desktop**: Fixed width (`w-56`), fills vertical space between Navbar and Footer.
+        *   **Mobile**: Collapsible drawer with overlay.
+        *   **Style**: Large icons (`24px`), readable text (`text-base`).
+    *   **Main Content**:
+        *   Scrollable area independently handling overflow.
+        *   **Scrollbars**: Hidden (`.no-scrollbar`) for a cleaner look while maintaining functionality.
 
 **Theme Support**:
 *   **Light/Dark Mode**: The application will support both light and dark themes.
@@ -43,10 +50,17 @@ The application is divided into two distinct zones with specific layouts:
 1.  **Landing Page / Home**: Public marketing page explaining features.
 2.  **Register**: User sign-up form.
 3.  **Login**: User authentication form.
-4.  **Web App Dashboard / Chat**: The core application where all financial interactions happen (Chat-centric UI).
+4.  **Web App Dashboard / Chat** (`/app/chats`): Core interaction center.
+5.  **Settings** (`/app/settings`): User profile management.
 
 ### 3.2 Features
-*   **Authentication**: Complete Register/Login flow with secure **JWT** based authentication. **Strictly Email-based authentication.** Includes **Smart Redirection** (returns user to intended page after login).
+*   **Authentication**:
+    *   Complete Register/Login flow with secure **JWT** based authentication (Access/Refresh tokens).
+    *   **Strictly Email-based authentication.**
+    *   **Smart Redirection**: Returns user to intended page after login.
+*   **User Management**:
+    *   **Profile Updates**: Users can update First Name and Last Name.
+    *   **Security Restrictions**: Email and Phone Number are **Read-Only** in the UI. Updates via API are restricted (return 403 Forbidden).
 *   **Transaction Management**: Create, read, update, delete transactions.
 *   **Entity Management**: Manage Contacts, Groups, and Accounts.
 *   **Ledger Calculation**: Automated balancing of shared expenses.
@@ -55,22 +69,21 @@ The application is divided into two distinct zones with specific layouts:
 *   **Inputs**: User credentials, transaction amounts, dates, descriptions, split details.
 *   **Data Models**:
     *   **User**:
-        *   `username`: Unique handle for app interactions/chat.
+        *   `username`: Unique handle.
         *   `first_name`: Compulsory.
         *   `last_name`: Optional.
-        *   `email`: Unique, used for authentication (login).
-        *   `phone_number`: Unique, used for identification/discovery (not login).
-        *   `profile_photo`: Image path (Requires Pillow).
+        *   `email`: Unique, Read-Only after registration.
+        *   `phone_number`: Unique, Read-Only after registration.
+        *   `profile_photo`: Image path.
         *   `is_deleted`: Boolean (Soft delete flag).
-        *   `deleted_at`: Timestamp of deletion.
-*   **Outputs**: Net balances, transaction history feeds, expense reports.
+*   **Outputs**: Net balances, transaction history feeds.
 
 ## 4. Technical Constraints (Minor Details)
 ### 4.1 Technology Stack
 | Component | Technology | Tooling | Notes |
 | :--- | :--- | :--- | :--- |
 | **Backend** | **Python (>=3.13)** | `uv` | Modern runtime. |
-| **API Framework** | **Django (>=5.2.8)** & **DRF** | `simplejwt`, `Pillow` | **Django Rest Framework** for API. `simplejwt` for Auth. `Pillow` for images. |
+| **API Framework** | **Django (>=6.0)** & **DRF** | `simplejwt`, `Pillow` | **Django Rest Framework** for API. `simplejwt` for Auth. |
 | **Frontend** | **React.js (^19.2.0)** | **Vite (^7.2.4)** | TypeScript (~5.9.3), Tailwind CSS v4. |
 | **Database** | **PostgreSQL** | - | Required for complex relationship modeling. |
 | **Mobile** | **React Native** | - | Future target, sharing logic with web. |
@@ -86,6 +99,9 @@ PiePie/
 ├── frontend/      # React/Vite frontend application code
 │   ├── package.json
 │   ├── src/
+│   │   ├── components/  # Global UI components & Layouts
+│   │   ├── features/    # Feature-based folders (Auth, Settings)
+│   │   └── lib/         # Utilities (API, Helper functions)
 │   └── public/
 ├── Docs/          # Documentation including SRS
 │   └── SRS.md

@@ -1,31 +1,32 @@
 from rest_framework import generics, status, views, permissions
 from rest_framework.response import Response
-from django.contrib.auth import login, logout
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer
+from .serializers import UserRegistrationSerializer, UserSerializer
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
 
-class LoginView(views.APIView):
-    permission_classes = [permissions.AllowAny]
-    serializer_class = UserLoginSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        login(request, user)
-        return Response(UserSerializer(user).data)
 
 class LogoutView(views.APIView):
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class UserDataView(generics.RetrieveAPIView):
+class UserDataView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
+
+class UpdateEmailView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def put(self, request):
+        return Response({"error": "Cannot update email address at this time."}, status=status.HTTP_403_FORBIDDEN)
+
+class UpdatePhoneView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request):
+        return Response({"error": "Cannot update phone number at this time."}, status=status.HTTP_403_FORBIDDEN)

@@ -23,25 +23,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-class UserLoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, data):
-        email = data.get('email')
-        password = data.get('password')
-
-        if email and password:
-            user = authenticate(request=self.context.get('request'), email=email, password=password)
-            if not user:
-                raise serializers.ValidationError("Invalid email or password.")
-        else:
-            raise serializers.ValidationError("Must include 'email' and 'password'.")
-
-        data['user'] = user
-        return data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number', 'profile_photo']
+        read_only_fields = ['email', 'phone_number']

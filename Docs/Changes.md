@@ -1,5 +1,18 @@
 # Changelog
 
+## [2025-12-10 20:50] feat(app): implement settings & refine application layout
+**Summary:** Implemented User Settings (Profile Update), enforced security restrictions on Email/Phone, and significantly polished the application layout (App Shell, Full-Width Footer, Hidden Scrollbars). Updated SRS to v0.2.0.
+**Files Changed:**
+* `Docs/SRS.md`: Updated to v0.2.0 reflecting Layout and Feature changes.
+* `backend/core/views.py`: Upgraded `UserDataView` to support PATCH updates. Added `UpdateEmailView`/`UpdatePhoneView` (Restricted).
+* `backend/core/serializers.py`: Marked `email` and `phone_number` as read-only.
+* `frontend/src/features/Settings/`: [NEW] Added `SettingsPage.tsx` with Profile Form and Security Section.
+* `frontend/src/components/layout/ProtectedLayout.tsx`: Refactored to "App Shell" structure (Navbar -> Flex content -> Full-Width Footer). Hidden scrollbars.
+* `frontend/src/components/layout/Sidebar.tsx`: Reduced width to `w-56`, increased icon sizes, removed sticky positioning.
+* `frontend/src/features/Auth/api.ts` & `AuthContext.tsx`: Added `updateProfile` and restricted field update methods.
+* `frontend/src/index.css`: Added `.no-scrollbar` utility.
+
+
 ## [2025-12-10 14:02] feat(ui): improve responsive layout & documentation
 **Summary:** Refined the application layout for better responsiveness and usability. Key improvements include a Mobile Sidebar (Drawer) toggle, Full-Width Desktop Layout (removing max-width boundaries), and Fixed/Scrollable Footer positioning. Also synchronized the `README.md` and `SRS.md` documenation with the latest codebase state.
 **Files Changed:**

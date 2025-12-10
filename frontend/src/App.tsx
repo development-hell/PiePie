@@ -5,6 +5,7 @@ import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/features/Auth/pages/LoginPage";
 import { RegisterPage } from "@/features/Auth/pages/RegisterPage";
 import { RequireAuth, PublicOnly } from "@/components/RouteGuards";
+import { SettingsPage } from "@/features/Settings/pages/SettingsPage";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
       {/* Public Routes (Accessible to everyone, but auth pages divert if logged in) */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
-        
+
         {/* Only allow access if NOT logged in */}
         <Route element={<PublicOnly />}>
           <Route path="/login" element={<LoginPage />} />
@@ -26,7 +27,7 @@ function App() {
           <Route index element={<Navigate to="/app/chats" replace />} />
           <Route path="chats" element={<div className="p-4">Chats Placeolder</div>} />
           <Route path="contacts" element={<div className="p-4">Contacts Placeholder</div>} />
-          <Route path="settings" element={<div className="p-4">Settings Placeholder</div>} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>
 
