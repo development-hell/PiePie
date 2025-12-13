@@ -1,5 +1,16 @@
 # Changelog
 
+## [2025-12-13 23:55] feat(ui): implement collapsible desktop sidebar & update docs
+**Summary:** Enhanced the Desktop Sidebar to be collapsible (`w-20` <-> `w-56`) with a "Pin" feature via double-click. Reverted uncommitted Real-Time Chat infrastructure to clean up the codebase. Updated SRS and README to reflect the current state (React 19, Django 6).
+**Files Changed:**
+*   `frontend/src/components/layout/Navbar.tsx`: Added `onMenuDoubleClick` prop to capture pinning intent.
+*   `frontend/src/components/layout/ProtectedLayout.tsx`: Implemented state management for `isDesktopExpanded` and `isPinned`. Fixed layout to use `h-dvh` and correct flexbox flow instead of fixed `vh` heights.
+*   `frontend/src/components/layout/Sidebar.tsx`: Added styles for collapsed vs expanded states. Changed desktop positioning to `relative` to respect layout flow.
+*   `backend/config/settings.py`: Removed `channels` and `daphne` apps (reverting unused real-time config).
+*   `Docs/SRS.md`: Updated Sidebar specifications and Tech Stack versions.
+*   `README.md`: Refreshed badges, feature list, and installation guides.
+
+
 ## [2025-12-13 09:05] feat(chat): implement core messaging and transaction system
 **Summary:** Implemented the core "Chat & Transaction" feature set. This allows users to manage contacts, navigate to 1:1 chats, exchange text messages, and record financial transactions. Currently operating via REST API (Fetch-on-load). Also enhanced user profile validation.
 **Backend Changes:**

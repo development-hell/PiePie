@@ -35,8 +35,12 @@ The application is divided into two distinct zones with specific layouts:
         *   **Middle**: Flex Row containing Sidebar and Main Content.
         *   **Bottom**: Full-width Footer.
     *   **Sidebar**:
-        *   **Desktop**: Fixed width (`w-56`), fills vertical space between Navbar and Footer.
-        *   **Mobile**: Collapsible drawer with overlay.
+        *   **Desktop**:
+            *   **Default**: Collapsed (`w-20`), displaying icons only.
+            *   **Interactive**:
+                *   **Click**: Expands temporally (`w-56`) to show labels. Collapses on outside click.
+                *   **Double-Click**: Pins sidebar open.
+        *   **Mobile**: Fixed Collapsible drawer with overlay.
         *   **Style**: Large icons (`24px`), readable text (`text-base`).
     *   **Main Content**:
         *   Scrollable area independently handling overflow.

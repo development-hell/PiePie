@@ -2,10 +2,10 @@
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Python](https://img.shields.io/badge/Python-3.13+-blue?logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-5.1+-092E20?logo=django&logoColor=white)
-![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=black)
+![Django](https://img.shields.io/badge/Django-6.0+-092E20?logo=django&logoColor=white)
+![React](https://img.shields.io/badge/React-19+-61DAFB?logo=react&logoColor=black)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6.0+-646CFF?logo=vite&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7.0+-646CFF?logo=vite&logoColor=white)
 
 PiePie is a unified personal finance application designed to merge personal expense tracking, shared ledgers, and informal debts into a single, networked platform. It aims to solve financial fragmentation by treating every transaction as a potential networked interaction between users.
 
@@ -14,14 +14,14 @@ PiePie is a unified personal finance application designed to merge personal expe
 ## 🛠️ Tech Stack
 
 ### Backend
-*   **Core:** Python 3.13+, Django 5.1+, Django Rest Framework (DRF)
+*   **Core:** Python 3.13+, Django 6.0+, Django Rest Framework (DRF)
 *   **Auth:** `djangorestframework-simplejwt` (JWT Authentication)
 *   **Database:** PostgreSQL (Production), SQLite (Dev)
 *   **Tooling:** `uv` (Package Management)
 
 ### Frontend
-*   **Core:** React 18, TypeScript
-*   **Build:** Vite
+*   **Core:** React 19, TypeScript
+*   **Build:** Vite 7
 *   **Styling:** Tailwind CSS v4 (Variable-based theming)
 *   **Routing:** React Router DOM 7
 *   **State:** React Context API (Auth), Axios (API Client)
@@ -69,12 +69,13 @@ The project follows a decoupled structure:
 PiePie/
 ├── backend/               # Django API
 │   ├── config/            # Settings & Configuration
-│   ├── core/              # Core functionality (Auth, User Model)
+│   ├── core/              # Core functionality (Auth, User Model, Contacts)
+│   ├── ledger/            # Transaction & Ledger logic
 │   └── manage.py
 ├── frontend/              # React Client
 │   ├── src/
 │   │   ├── components/    # Global shared components
-│   │   ├── features/      # Feature-based modules (Auth, etc.)
+│   │   ├── features/      # Feature-based modules (Auth, Chat, Contacts)
 │   │   ├── lib/           # Utilities (API client)
 │   │   ├── App.tsx        # Main Routing
 │   │   └── index.css      # Global Styles & Theme Variables
@@ -89,11 +90,17 @@ PiePie/
 *   **🔐 Authentication:** Safe and secure Email-based Login & Registration using **JWT**.
     *   Auto-refreshing tokens via Axios interceptors.
     *   Smart Redirection (`?next=`) logic.
+*   **👥 Contacts Management:**
+    *   Add users by unique username.
+    *   Shared transaction history.
+*   **💸 Transaction Ledger:**
+    *   Record expenses/payments with contacts.
+    *   Smart splitting logic (Basic).
 *   **🛡️ Route Protection:** Check authentication state before accessing private routes (`/app/*`).
 *   **🎨 Dynamic Theming:** Light/Dark mode support using CSS Variables & Tailwind v4.
 *   **📱 Responsive Layouts:**
-    *   **Public Layout:** Landing page & Auth forms.
-    *   **Protected Layout:** App Dashboard with sidebar navigation and profile management.
+    *   **Mobile:** App-like Full-screen experience with Collapsible Drawer.
+    *   **Desktop:** "Holy Grail" layout with **Collapsible/Pinnable Sidebar** (`w-20` <-> `w-56`).
 *   **👤 User Profile:** Manage session via Navbar dropdown.
 
 ---

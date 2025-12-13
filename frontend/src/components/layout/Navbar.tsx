@@ -6,9 +6,10 @@ import { LogOut, Settings, User as UserIcon, Menu } from "lucide-react";
 
 interface NavbarProps {
   onMenuClick?: () => void;
+  onMenuDoubleClick?: () => void;
 }
 
-export function Navbar({ onMenuClick }: NavbarProps) {
+export function Navbar({ onMenuClick, onMenuDoubleClick }: NavbarProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,12 +39,13 @@ export function Navbar({ onMenuClick }: NavbarProps) {
     <nav className="border-b border-border bg-surface-overlay backdrop-blur-md sticky top-0 z-50">
       <div className="w-full px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* Mobile Menu Button - Only visible if logged in and onMenuClick provided */}
+          {/* Menu Button - Visible on both Mobile and Desktop now */}
           {user && onMenuClick && (
             <button
               onClick={onMenuClick}
-              className="md:hidden p-2 -ml-2 text-text hover:bg-surface-muted rounded-md"
-              aria-label="Open menu"
+              onDoubleClick={onMenuDoubleClick}
+              className="p-2 -ml-2 text-text hover:bg-surface-muted rounded-md"
+              aria-label="Toggle menu"
             >
               <Menu className="w-5 h-5" />
             </button>
