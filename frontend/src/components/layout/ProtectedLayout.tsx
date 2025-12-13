@@ -14,9 +14,7 @@ export function ProtectedLayout() {
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           <main className="flex-1 h-[80vh] overflow-y-auto no-scrollbar">
-            <div className="p-4 pb-8">
-              <Outlet />
-            </div>
+            <Outlet />
           </main>
         </div>
       </div>

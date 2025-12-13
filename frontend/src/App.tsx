@@ -6,6 +6,9 @@ import { LoginPage } from "@/features/Auth/pages/LoginPage";
 import { RegisterPage } from "@/features/Auth/pages/RegisterPage";
 import { RequireAuth, PublicOnly } from "@/components/RouteGuards";
 import { SettingsPage } from "@/features/Settings/pages/SettingsPage";
+import { ContactsPage } from "@/features/Contacts/pages/ContactsPage";
+
+import { ChatsPage } from "@/features/Chat/pages/ChatsPage";
 
 function App() {
   return (
@@ -25,8 +28,9 @@ function App() {
       <Route element={<RequireAuth />}>
         <Route path="/app" element={<ProtectedLayout />}>
           <Route index element={<Navigate to="/app/chats" replace />} />
-          <Route path="chats" element={<div className="p-4">Chats Placeolder</div>} />
-          <Route path="contacts" element={<div className="p-4">Contacts Placeholder</div>} />
+          <Route path="chats" element={<ChatsPage />} />
+          <Route path="chats/:username" element={<ChatsPage />} />
+          <Route path="contacts" element={<ContactsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>

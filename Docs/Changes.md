@@ -1,5 +1,26 @@
 # Changelog
 
+## [2025-12-13 09:05] feat(chat): implement core messaging and transaction system
+**Summary:** Implemented the core "Chat & Transaction" feature set. This allows users to manage contacts, navigate to 1:1 chats, exchange text messages, and record financial transactions. Currently operating via REST API (Fetch-on-load). Also enhanced user profile validation.
+**Backend Changes:**
+* `backend/ledger/`: [NEW] Created `ledger` app.
+    * `models.py`: Added `Transaction` and `Message` models.
+    * `views.py`: Implemented `ChatViewSet` for message history and transaction creation.
+    * `serializers.py`: Added serializers for Messages and Transactions.
+* `backend/core/`:
+    * `models.py`: Added `RegexValidator` for usernames. Fixed `phone_number` length.
+    * `views.py`: Implemented `ContactViewSet`.
+**Frontend Changes:**
+* `frontend/src/features/Chat/`: [NEW] Implemented full Chat UI.
+    * `ChatSidebar.tsx`: Lists recent chats with "You:" prefix for sent messages.
+    * `ChatWindow.tsx`: Message list and input area.
+    * `MessageBubble.tsx`: Renders text or transaction cards.
+* `frontend/src/features/Contacts/`:
+    * `ContactsPage.tsx`: Implemented Contact List with navigation to Chat.
+* `frontend/src/features/Settings/`: Added username editing to `SettingsPage`.
+* `frontend/src/App.tsx`: Registered Chat and Contact routes.
+
+
 ## [2025-12-10 20:50] feat(app): implement settings & refine application layout
 **Summary:** Implemented User Settings (Profile Update), enforced security restrictions on Email/Phone, and significantly polished the application layout (App Shell, Full-Width Footer, Hidden Scrollbars). Updated SRS to v0.2.0.
 **Files Changed:**

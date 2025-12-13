@@ -17,10 +17,12 @@
 - [x] **Routing**: Install `react-router-dom` and setup routes (/, /login, /register, /app).
 - [x] **UI Framework**: Setup TailwindCSS (if deciding to use it) or basic CSS variables for "Theme".
 - [x] **Public Pages**: Implement `LandingPage`, `LoginPage`, `RegisterPage`.
-- [ ] **Private App**: Implement `Dashboard` layout (Sidebar + Chat Area).
+- [x] **Private App**: Implement `ProtectedLayout` (Sidebar + Navbar) and `SettingsPage`.
+- [ ] **Dashboard / Chat**: Implement actual Chat/Transaction Interface.
 
 ## 🔴 Pending / Future
-- [ ] **Entity Models**: Define Contact, Group, Variable Expenses models.
-- [ ] **Transaction Logic**: APIs for creating and listing transactions.
-- [ ] **WebSockets**: Real-time updates for chat interface (Django Channels?).
+### Core Logic (Phase 3)
+- [ ] **Contacts & Groups**: Models, APIs, and UI for managing entities.
+- [ ] **Transactions**: Backend Models (Split logic), API, and Ledger UI.
+- [ ] **WebSockets**: Real-time updates for chat interface.
 - [ ] **Deployment Config**: Dockerfile and docker-compose.yml.

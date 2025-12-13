@@ -1,3 +1,99 @@
-from django.shortcuts import render
+from core.serializers import UserSerializer
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-# Create your views here.
+from .models import Message, Transaction
+from .serializers import CreateMessageSerializer, MessageSerializer
+
+User = get_user_model()
+
+
+class ChatViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=["get"])
+    def recent_chats(self, request):
+        """
+        Returns a list of users the current user has chatted/transacted with,
+        ordered by the most recent activity.
+        """
+        user = request.user
+
+        # We need to find the latest message for each distinct counterpart.
+        # Strategy: Get all messages involving user, annotate/order, then distinct in Python.
+        # Note: distinct on fields is Postgres only, but we want universal support if possible.
+        # Python set filtering is easier for MVP.
+
+        start_msgs = (
+            Message.objects.filter(Q(sender=user) | Q(recipient=user)).select_related("sender", "recipient", "transaction").order_by("-created_at")
+        )
+
+        chats = []
+        seen_users = set()
+
+        for msg in start_msgs:
+            other_user = msg.recipient if msg.sender == user else msg.sender
+            if other_user.id not in seen_users:
+                seen_users.add(other_user.id)
+                chats.append({"user": UserSerializer(other_user).data, "last_message": MessageSerializer(msg).data})
+
+        return Response(chats)
+
+    @action(detail=False, methods=["get"], url_path=r"(?P<username>[^/.]+)/messages")
+    def messages(self, request, username=None):
+        """
+        Get chat history with a specific user.
+        """
+        user = request.user
+        try:
+            other_user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
+
+        msgs = (
+            Message.objects.filter((Q(sender=user) & Q(recipient=other_user)) | (Q(sender=other_user) & Q(recipient=user)))
+            .select_related("transaction", "sender", "recipient")
+            .order_by("created_at")
+        )  # Chronological for frontend to reverse
+
+        return Response(MessageSerializer(msgs, many=True).data)
+
+    @action(detail=False, methods=["post"], url_path=r"(?P<username>[^/.]+)/send")
+    def send_message(self, request, username=None):
+        """
+        Send a message or create a transaction.
+        """
+        user = request.user
+        try:
+            recipient = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
+
+        if recipient == user:
+            return Response({"error": "Cannot chat with yourself"}, status=400)
+
+        serializer = CreateMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+
+            # 1. Handle Transaction if amount present
+            transaction = None
+            if data.get("amount"):
+                transaction = Transaction.objects.create(
+                    payer=user, recipient=recipient, amount=data["amount"], description=data.get("description", "Money Transfer")
+                )
+
+            # 2. Create Message
+            # If no content but transaction exists, generate default content
+            content = data.get("content")
+            if not content and transaction:
+                content = f"💸 Sent ${data['amount']}"
+
+            message = Message.objects.create(sender=user, recipient=recipient, content=content, transaction=transaction)
+
+            return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

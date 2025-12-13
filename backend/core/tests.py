@@ -22,7 +22,7 @@ class AuthTests(APITestCase):
 
     def test_login_user_jwt(self):
         # Create user first
-        user = User.objects.create_user(
+        User.objects.create_user(
             username='loginuser',
             email='login@example.com',
             first_name='Login',
