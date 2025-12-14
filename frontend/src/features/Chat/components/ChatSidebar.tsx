@@ -1,4 +1,4 @@
-import type { RecentChat } from "../types";
+import type { RecentChat } from "@/features/Chat/types";
 import { Link, useParams } from "react-router-dom";
 import { User } from "lucide-react";
 import { cn } from "@/lib/utils";

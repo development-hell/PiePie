@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { ChatSidebar } from "../components/ChatSidebar";
-import { ChatWindow } from "../components/ChatWindow";
-import { chatApi } from "../api";
-import type { RecentChat } from "../types";
+import { ChatSidebar } from "@/features/Chat/components/ChatSidebar";
+import { ChatWindow } from "@/features/Chat/components/ChatWindow";
+import { chatApi } from "@/features/Chat/api";
+import type { RecentChat } from "@/features/Chat/types";
 import { cn } from "@/lib/utils";
 import { MessageSquare } from "lucide-react";
 

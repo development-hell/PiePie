@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import type { Message, SendMessagePayload } from "../types";
-import { chatApi } from "../api";
-import { MessageBubble } from "./MessageBubble";
+import { useChatMessages } from "@/features/Chat/hooks/useChatMessages";
+import type { SendMessagePayload } from "@/features/Chat/types";
+import { chatApi } from "@/features/Chat/api";
+import { MessageBubble } from "@/features/Chat/components/MessageBubble";
 import { Send, DollarSign, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,8 +11,9 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ recipientUsername }: ChatWindowProps) {
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { messages, isLoading, isLoadingHistory, hasMore, loadMore, addMessage } = useChatMessages(recipientUsername);
+
+    // Input State
     const [inputText, setInputText] = useState("");
     const [isSending, setIsSending] = useState(false);
 
@@ -21,33 +23,72 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
     const [description, setDescription] = useState("");
 
     const scrollRef = useRef<HTMLDivElement>(null);
+    const previousHeightRef = useRef(0);
 
-    // Fetch Messages
+    // Auto-scroll to bottom ONCE on initial load or when sending new message (if near bottom)
+    // Complex scroll logic: 
+    // 1. If loading history: maintain relative position.
+    // 2. If new message arrives/polling: scroll to bottom ONLY IF user was at bottom. 
+    // For MVP: Scroll to bottom on mount. Scroll to bottom on NEW message sent (handled by sending).
+
+    // UseRef to track if we just loaded history
+    const isHistoryLoadingRef = useRef(false);
+
     useEffect(() => {
-        const fetchMessages = async () => {
-            setIsLoading(true);
-            try {
-                const data = await chatApi.getMessages(recipientUsername);
-                setMessages(data);
-            } catch (error) {
-                console.error("Failed to load messages", error);
-            } finally {
-                setIsLoading(false);
+        if (isLoadingHistory) {
+            // Capture height before update
+            if (scrollRef.current) {
+                previousHeightRef.current = scrollRef.current.scrollHeight;
+                isHistoryLoadingRef.current = true;
             }
-        };
-
-        if (recipientUsername) {
-            fetchMessages();
-            // Optional: Poll for new messages here or setup WebSocket
         }
+    }, [isLoadingHistory]);
+
+    // Handle Scroll Position Restoration after History Load
+    useEffect(() => {
+        if (isHistoryLoadingRef.current && !isLoadingHistory && scrollRef.current) {
+            const newHeight = scrollRef.current.scrollHeight;
+            const diff = newHeight - previousHeightRef.current;
+            scrollRef.current.scrollTop = diff; // Jump down by the amount of added content
+            isHistoryLoadingRef.current = false;
+        }
+    }, [messages, isLoadingHistory]); // Run when messages update
+
+    // Handle Initial Scroll to Bottom
+    useEffect(() => {
+        if (!isLoading && messages.length > 0 && !isHistoryLoadingRef.current) {
+            // Logic handled by initialScrolled below
+        }
+    }, [isLoading, recipientUsername]);
+
+    // Simple auto-scroll to bottom on MOUNT only or change of recipient
+    const [initialScrolled, setInitialScrolled] = useState(false);
+    useEffect(() => {
+        if (!isLoading && messages.length > 0 && scrollRef.current) {
+            // If this is a fresh conversation load (not polling update), scroll to bottom
+            // We can heuristic: if messages length is small (30) it's likely initial.
+            // OR just scroll to bottom initially.
+            // We will assume users want to see latest.
+            if (!initialScrolled) {
+                scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                setInitialScrolled(true);
+            }
+        }
+    }, [isLoading, recipientUsername, messages.length]); // messages.length check might be annoying on poll.
+
+    // Reset initialScrolled on recipient change
+    useEffect(() => {
+        setInitialScrolled(false);
     }, [recipientUsername]);
 
-    // Auto-scroll to bottom
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+
+    // Infinite Scroll Handler
+    const handleScroll = () => {
+        if (!scrollRef.current) return;
+        if (scrollRef.current.scrollTop === 0 && hasMore && !isLoadingHistory) {
+            loadMore();
         }
-    }, [messages]);
+    };
 
     const handleSend = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -63,11 +104,19 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
 
             if (isTransactionMode) {
                 payload.amount = parseFloat(amount);
-                payload.description = description || inputText; // Use input text as description if desc empty
+                payload.description = description || inputText;
             }
 
             const newMsg = await chatApi.sendMessage(payload);
-            setMessages([...messages, newMsg]);
+            addMessage(newMsg); // Optimistic update via hook
+
+            // Scroll to bottom
+            if (scrollRef.current) {
+                // Determine if we should smooth scroll?
+                setTimeout(() => {
+                    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                }, 100);
+            }
 
             // Reset
             setInputText("");
@@ -93,7 +142,17 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
+            <div
+                className="flex-1 overflow-y-auto p-4 space-y-4"
+                ref={scrollRef}
+                onScroll={handleScroll}
+            >
+                {isLoadingHistory && (
+                    <div className="flex justify-center py-2">
+                        <Loader2 className="w-5 h-5 animate-spin text-primary/50" />
+                    </div>
+                )}
+
                 {messages.length === 0 ? (
                     <div className="text-center text-text-muted mt-10">
                         <p>No messages yet.</p>

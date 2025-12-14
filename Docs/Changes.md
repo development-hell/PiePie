@@ -1,5 +1,20 @@
 # Changelog
 
+## [2025-12-14 13:50] feat(chat): implement polling, lazy loading & refactor imports
+**Summary:** Implemented "Near Real-Time" messaging using a Polling Strategy (3s interval) combined with "Lazy Loading" for history (Pagination). Major refactor of Frontend Chat architecture to use Custom Hooks and Absolute Imports.
+**Backend Changes:**
+*   `backend/ledger/views.py`: Added `StandardResultsSetPagination` (Page Size: 20). Updated `messages` endpoint to support `?page=` (History) and `?after=` (Polling).
+**Frontend Changes:**
+*   `frontend/src/features/Chat/hooks/useChatMessages.ts`: [NEW] Custom hook managing:
+    *   Initial Load (Page 1 reversed).
+    *   Polling (Appending new messages).
+    *   History Loading (Prepending older pages).
+*   `frontend/src/features/Chat/components/ChatWindow.tsx`: integrated `useChatMessages` and improved scroll management.
+*   `frontend/src/features/Chat/`: Refactored all relative imports (`../`) to Absolute Paths (`@/features/...`) compliance.
+**Documentation:**
+*   `Docs/SRS.md`: Updated to reflect Polling architecture and file structure changes.
+
+
 ## [2025-12-13 23:55] feat(ui): implement collapsible desktop sidebar & update docs
 **Summary:** Enhanced the Desktop Sidebar to be collapsible (`w-20` <-> `w-56`) with a "Pin" feature via double-click. Reverted uncommitted Real-Time Chat infrastructure to clean up the codebase. Updated SRS and README to reflect the current state (React 19, Django 6).
 **Files Changed:**

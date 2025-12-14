@@ -1,4 +1,4 @@
-import type { Message } from "../types";
+import type { Message } from "@/features/Chat/types";
 import { useAuth } from "@/features/Auth/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";

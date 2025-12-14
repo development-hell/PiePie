@@ -1,6 +1,6 @@
 # PiePie - Software Requirements Specification (SRS)
 **Version**: 0.2.0 (Living Document)
-**Date**: December 10, 2025
+**Date**: December 14, 2025
 **Project Owner**: Kishan Dev
 
 ## 1. Introduction
@@ -65,7 +65,11 @@ The application is divided into two distinct zones with specific layouts:
 *   **User Management**:
     *   **Profile Updates**: Users can update First Name and Last Name.
     *   **Security Restrictions**: Email and Phone Number are **Read-Only** in the UI. Updates via API are restricted (return 403 Forbidden).
-*   **Transaction Management**: Create, read, update, delete transactions.
+*   **Transaction & Chat Management**:
+    *   **Unified Chat Interface**: Messages and Transactions appear in a single chronological feed.
+    *   **Real-Time Updates (Polling)**: "Near real-time" experience via smart polling (3s interval, window-focus aware).
+    *   **Lazy Loading**: Efficient history loading. Initial fetch (30 items) with seamless scroll-up pagination.
+    *   Create, read, update, delete transactions.
 *   **Entity Management**: Manage Contacts, Groups, and Accounts.
 *   **Ledger Calculation**: Automated balancing of shared expenses.
 
@@ -80,6 +84,8 @@ The application is divided into two distinct zones with specific layouts:
         *   `phone_number`: Unique, Read-Only after registration.
         *   `profile_photo`: Image path.
         *   `is_deleted`: Boolean (Soft delete flag).
+    *   **Message**:
+        *   `sender`, `recipient`, `content`, `transaction_link`.
 *   **Outputs**: Net balances, transaction history feeds.
 
 ## 4. Technical Constraints (Minor Details)
@@ -98,13 +104,21 @@ The project follows a decoupled structure separating the backend API and the fro
 ```
 PiePie/
 ├── backend/       # Python backend application code (Django + DRF)
+│   ├── core/      # User & Auth
+│   ├── ledger/    # Chat & Transactions
 │   ├── main.py
 │   └── pyproject.toml
 ├── frontend/      # React/Vite frontend application code
 │   ├── package.json
 │   ├── src/
 │   │   ├── components/  # Global UI components & Layouts
-│   │   ├── features/    # Feature-based folders (Auth, Settings)
+│   │   ├── features/    # Feature-based folders (Auth, Chat, Contacts, Settings)
+│   │   │   └── Chat/
+│   │   │       ├── components/
+│   │   │       ├── hooks/       # Custom hooks (useChatMessages)
+│   │   │       ├── pages/
+│   │   │       ├── api.ts
+│   │   │       └── types.ts
 │   │   └── lib/         # Utilities (API, Helper functions)
 │   └── public/
 ├── Docs/          # Documentation including SRS
@@ -135,6 +149,7 @@ This project enforces strict development guidelines to ensure maintainability an
 *   **Components**: Key patterns:
     *   **Skeletons**: Use Skeleton loaders instead of full-screen spinners.
     *   **Functional**: Use React Functional Components with strict TS interfaces.
+    *   **Imports**: Use Absolute Imports (`@/features/...`) exclusively.
 
 ### 5.3 Backend Standards (Django)
 *   **Data Safety**: **Soft Delete Only.**

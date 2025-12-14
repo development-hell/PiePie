@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .models import Message, Transaction
@@ -11,8 +12,15 @@ from .serializers import CreateMessageSerializer, MessageSerializer
 User = get_user_model()
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class ChatViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
 
     @action(detail=False, methods=["get"])
     def recent_chats(self, request):
@@ -46,6 +54,9 @@ class ChatViewSet(viewsets.ViewSet):
     def messages(self, request, username=None):
         """
         Get chat history with a specific user.
+        Supports:
+        - Pagination (default 20 items)
+        - Polling via '?after=<timestamp>' (returns messages created after this time)
         """
         user = request.user
         try:
@@ -53,13 +64,30 @@ class ChatViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
-        msgs = (
-            Message.objects.filter((Q(sender=user) & Q(recipient=other_user)) | (Q(sender=other_user) & Q(recipient=user)))
-            .select_related("transaction", "sender", "recipient")
-            .order_by("created_at")
-        )  # Chronological for frontend to reverse
+        # Base Query
+        msgs = Message.objects.filter((Q(sender=user) & Q(recipient=other_user)) | (Q(sender=other_user) & Q(recipient=user))).select_related(
+            "transaction", "sender", "recipient"
+        )
 
-        return Response(MessageSerializer(msgs, many=True).data)
+        # Polling: If 'after' is provided, we just want everything NEWER than that
+        after_timestamp = request.query_params.get("after")
+        if after_timestamp:
+            msgs = msgs.filter(created_at__gt=after_timestamp).order_by("created_at")  # Oldest -> Newest for appending
+            return Response(MessageSerializer(msgs, many=True).data)
+
+        # Pagination: Standard history load (Latest First)
+        paginator = StandardResultsSetPagination()
+        msgs = msgs.order_by("-created_at")
+        page = paginator.paginate_queryset(msgs, request)
+
+        if page is not None:
+            # We return paged results. Note: They are ordered -created_at (Newest First).
+            # Frontend will likely want to reverse them to display Chronologically.
+            serializer = MessageSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = MessageSerializer(msgs, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["post"], url_path=r"(?P<username>[^/.]+)/send")
     def send_message(self, request, username=None):

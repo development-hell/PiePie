@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { Message, RecentChat, SendMessagePayload } from "./types";
+import type { Message, PaginatedResponse, RecentChat, SendMessagePayload } from "@/features/Chat/types";
 
 export const chatApi = {
     getRecentChats: async (): Promise<RecentChat[]> => {
@@ -7,8 +7,8 @@ export const chatApi = {
         return response.data;
     },
 
-    getMessages: async (username: string): Promise<Message[]> => {
-        const response = await api.get(`/chats/${username}/messages/`);
+    getMessages: async (username: string, params: { page?: number; after?: string } = {}): Promise<PaginatedResponse<Message> | Message[]> => {
+        const response = await api.get(`/chats/${username}/messages/`, { params });
         return response.data;
     },
 
