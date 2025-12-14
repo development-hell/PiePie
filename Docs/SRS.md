@@ -1,5 +1,5 @@
 # PiePie - Software Requirements Specification (SRS)
-**Version**: 0.2.0 (Living Document)
+**Version**: 0.3.0 (Living Document)
 **Date**: December 14, 2025
 **Project Owner**: Kishan Dev
 
@@ -30,6 +30,7 @@ PiePie will allow users to manage all money movements as transactions between en
 The application is divided into two distinct zones with specific layouts:
 1.  **Public Zone (PublicLayout)**: Accessible to everyone (Landing Page, Auth). Contains Navbar and Footer.
 2.  **Private App Zone (ProtectedLayout)**: A chat-centric, Telegram-Web-like interface for logged-in users.
+    *   **Transaction-First Chat UI**: The chat window input defaults to valid transaction entry (Amount, Pay/Request buttons) with a toggle for standard text messages.
     *   **App Shell Structure**: `h-screen` Flex Column.
         *   **Top**: Navbar (Logo, Theme Toggle, Profile Dropdown).
         *   **Middle**: Flex Row containing Sidebar and Main Content.
@@ -69,6 +70,10 @@ The application is divided into two distinct zones with specific layouts:
     *   **Unified Chat Interface**: Messages and Transactions appear in a single chronological feed.
     *   **Real-Time Updates (Polling)**: "Near real-time" experience via smart polling (3s interval, window-focus aware).
     *   **Lazy Loading**: Efficient history loading. Initial fetch (30 items) with seamless scroll-up pagination.
+    *   **Transaction Workflow**:
+        *   **Send vs Request**: Distinct flows for paying vs requesting money.
+        *   **Confirmation Loop**: Transactions start as `PENDING`. Counterparty must `CONFIRM` or `REJECT`.
+        *   **Security**: Initiator cannot approve their own requests.
     *   Create, read, update, delete transactions.
 *   **Entity Management**: Manage Contacts, Groups, and Accounts.
 *   **Ledger Calculation**: Automated balancing of shared expenses.
@@ -86,6 +91,10 @@ The application is divided into two distinct zones with specific layouts:
         *   `is_deleted`: Boolean (Soft delete flag).
     *   **Message**:
         *   `sender`, `recipient`, `content`, `transaction_link`.
+    *   **Transaction**:
+        *   `payer`, `recipient`, `amount`, `description`.
+        *   `status`: PENDING, CONFIRMED, REJECTED.
+        *   `created_by`: User who initiated the transaction (for Pay vs Request logic).
 *   **Outputs**: Net balances, transaction history feeds.
 
 ## 4. Technical Constraints (Minor Details)

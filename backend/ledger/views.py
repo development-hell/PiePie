@@ -92,7 +92,7 @@ class ChatViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["post"], url_path=r"(?P<username>[^/.]+)/send")
     def send_message(self, request, username=None):
         """
-        Send a message or create a transaction.
+        Send a message or create a transaction (Pay or Request).
         """
         user = request.user
         try:
@@ -110,18 +110,83 @@ class ChatViewSet(viewsets.ViewSet):
             # 1. Handle Transaction if amount present
             transaction = None
             if data.get("amount"):
+                t_type = data.get("transaction_type", "pay")
+
+                # Determine Payer/Recipient based on type
+                if t_type == "pay":
+                    real_payer = user
+                    real_recipient = recipient
+                else:  # request
+                    real_payer = recipient
+                    real_recipient = user
+
                 transaction = Transaction.objects.create(
-                    payer=user, recipient=recipient, amount=data["amount"], description=data.get("description", "Money Transfer")
+                    payer=real_payer,
+                    recipient=real_recipient,
+                    amount=data["amount"],
+                    description=data.get("description", "Money Transfer"),
+                    created_by=user,
+                    status=Transaction.Status.PENDING,
                 )
 
             # 2. Create Message
             # If no content but transaction exists, generate default content
             content = data.get("content")
             if not content and transaction:
-                content = f"💸 Sent ${data['amount']}"
+                if data.get("transaction_type") == "request":
+                    content = f"📄 Requested ${data['amount']}"
+                else:
+                    content = f"💸 Sent ${data['amount']}"
 
             message = Message.objects.create(sender=user, recipient=recipient, content=content, transaction=transaction)
 
             return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["post"], url_path=r"transaction/(?P<pk>[^/.]+)/confirm")
+    def confirm_transaction(self, request, pk=None):
+        try:
+            txn = Transaction.objects.get(pk=pk)
+        except Transaction.DoesNotExist:
+            return Response({"error": "Transaction not found"}, status=404)
+
+        # Security: Only the user who DID NOT create it can confirm it
+        if request.user == txn.created_by:
+            return Response({"error": "You cannot confirm your own request"}, status=403)
+
+        # Also verify the user is actually involved
+        if request.user not in [txn.payer, txn.recipient]:
+            return Response({"error": "Not involved in transaction"}, status=403)
+
+        if txn.status != Transaction.Status.PENDING:
+            return Response({"error": "Transaction already processed"}, status=400)
+
+        txn.status = Transaction.Status.CONFIRMED
+        txn.save()
+        return Response({"status": "confirmed"})
+
+    @action(detail=False, methods=["post"], url_path=r"transaction/(?P<pk>[^/.]+)/reject")
+    def reject_transaction(self, request, pk=None):
+        try:
+            txn = Transaction.objects.get(pk=pk)
+        except Transaction.DoesNotExist:
+            return Response({"error": "Transaction not found"}, status=404)
+
+        # Security: Only the user who DID NOT create it can reject it (usually)
+        # Actually, maybe the creator can cancel?
+        # Requirement: "option for other user to confirm".
+        # Let's allow counterparty to reject. Creator can maybe delete? Soft delete covers deletion.
+
+        if request.user == txn.created_by:
+            return Response({"error": "You cannot reject your own request (delete it instead)"}, status=403)
+
+        if request.user not in [txn.payer, txn.recipient]:
+            return Response({"error": "Not involved"}, status=403)
+
+        if txn.status != Transaction.Status.PENDING:
+            return Response({"error": "Transaction already processed"}, status=400)
+
+        txn.status = Transaction.Status.REJECTED
+        txn.save()
+        return Response({"status": "rejected"})

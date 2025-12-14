@@ -15,5 +15,13 @@ export const chatApi = {
     sendMessage: async (payload: SendMessagePayload): Promise<Message> => {
         const response = await api.post(`/chats/${payload.recipient_username}/send/`, payload);
         return response.data;
+    },
+
+    confirmTransaction: async (transactionId: number): Promise<void> => {
+        await api.post(`/chats/transaction/${transactionId}/confirm/`);
+    },
+
+    rejectTransaction: async (transactionId: number): Promise<void> => {
+        await api.post(`/chats/transaction/${transactionId}/reject/`);
     }
 };

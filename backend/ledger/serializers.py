@@ -8,13 +8,14 @@ from .models import Message, Transaction
 class TransactionSerializer(serializers.ModelSerializer):
     payer = UserSerializer(read_only=True)
     recipient = UserSerializer(read_only=True)
+    created_by = UserSerializer(read_only=True)
 
     payer_id = serializers.PrimaryKeyRelatedField(source="payer", queryset=User.objects.all(), write_only=True)
     recipient_id = serializers.PrimaryKeyRelatedField(source="recipient", queryset=User.objects.all(), write_only=True)
 
     class Meta:
         model = Transaction
-        fields = ["id", "payer", "payer_id", "recipient", "recipient_id", "amount", "description", "created_at"]
+        fields = ["id", "payer", "payer_id", "recipient", "recipient_id", "created_by", "amount", "description", "status", "created_at"]
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -34,6 +35,7 @@ class CreateMessageSerializer(serializers.Serializer):
     # Optional transaction fields
     amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
     description = serializers.CharField(required=False, allow_blank=True)
+    transaction_type = serializers.ChoiceField(choices=["pay", "request"], required=False, default="pay")
 
     def validate(self, data):
         if not data.get("content") and not data.get("amount"):

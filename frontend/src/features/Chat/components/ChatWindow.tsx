@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { useChatMessages } from "@/features/Chat/hooks/useChatMessages";
-import type { SendMessagePayload } from "@/features/Chat/types";
 import { chatApi } from "@/features/Chat/api";
 import { MessageBubble } from "@/features/Chat/components/MessageBubble";
-import { Send, DollarSign, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useChatMessages } from "@/features/Chat/hooks/useChatMessages";
+import type { SendMessagePayload } from "@/features/Chat/types";
+import { ArrowDownLeft, ArrowUpRight, DollarSign, Loader2, MessageSquare, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface ChatWindowProps {
     recipientUsername: string;
@@ -17,83 +16,60 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
     const [inputText, setInputText] = useState("");
     const [isSending, setIsSending] = useState(false);
 
-    // Transaction Mode State
-    const [isTransactionMode, setIsTransactionMode] = useState(false);
+    // Mode State: 'transaction' is now Default.
+    const [mode, setMode] = useState<'transaction' | 'message'>('transaction');
+
+    // Transaction State
     const [amount, setAmount] = useState("");
     const [description, setDescription] = useState("");
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const previousHeightRef = useRef(0);
-
-    // Auto-scroll to bottom ONCE on initial load or when sending new message (if near bottom)
-    // Complex scroll logic: 
-    // 1. If loading history: maintain relative position.
-    // 2. If new message arrives/polling: scroll to bottom ONLY IF user was at bottom. 
-    // For MVP: Scroll to bottom on mount. Scroll to bottom on NEW message sent (handled by sending).
-
-    // UseRef to track if we just loaded history
     const isHistoryLoadingRef = useRef(false);
 
     useEffect(() => {
-        if (isLoadingHistory) {
-            // Capture height before update
-            if (scrollRef.current) {
-                previousHeightRef.current = scrollRef.current.scrollHeight;
-                isHistoryLoadingRef.current = true;
-            }
+        if (isLoadingHistory && scrollRef.current) {
+            previousHeightRef.current = scrollRef.current.scrollHeight;
+            isHistoryLoadingRef.current = true;
         }
     }, [isLoadingHistory]);
 
-    // Handle Scroll Position Restoration after History Load
     useEffect(() => {
         if (isHistoryLoadingRef.current && !isLoadingHistory && scrollRef.current) {
             const newHeight = scrollRef.current.scrollHeight;
             const diff = newHeight - previousHeightRef.current;
-            scrollRef.current.scrollTop = diff; // Jump down by the amount of added content
+            scrollRef.current.scrollTop = diff;
             isHistoryLoadingRef.current = false;
         }
-    }, [messages, isLoadingHistory]); // Run when messages update
+    }, [messages, isLoadingHistory]);
 
-    // Handle Initial Scroll to Bottom
-    useEffect(() => {
-        if (!isLoading && messages.length > 0 && !isHistoryLoadingRef.current) {
-            // Logic handled by initialScrolled below
-        }
-    }, [isLoading, recipientUsername]);
-
-    // Simple auto-scroll to bottom on MOUNT only or change of recipient
     const [initialScrolled, setInitialScrolled] = useState(false);
     useEffect(() => {
         if (!isLoading && messages.length > 0 && scrollRef.current) {
-            // If this is a fresh conversation load (not polling update), scroll to bottom
-            // We can heuristic: if messages length is small (30) it's likely initial.
-            // OR just scroll to bottom initially.
-            // We will assume users want to see latest.
             if (!initialScrolled) {
                 scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
                 setInitialScrolled(true);
             }
         }
-    }, [isLoading, recipientUsername, messages.length]); // messages.length check might be annoying on poll.
+    }, [isLoading, recipientUsername, messages.length, initialScrolled]);
 
-    // Reset initialScrolled on recipient change
     useEffect(() => {
         setInitialScrolled(false);
     }, [recipientUsername]);
 
-
-    // Infinite Scroll Handler
     const handleScroll = () => {
-        if (!scrollRef.current) return;
-        if (scrollRef.current.scrollTop === 0 && hasMore && !isLoadingHistory) {
+        if (scrollRef.current && scrollRef.current.scrollTop === 0 && hasMore && !isLoadingHistory) {
             loadMore();
         }
     };
 
-    const handleSend = async (e?: React.FormEvent) => {
+    const handleSend = async (e?: React.FormEvent, type?: 'pay' | 'request') => {
         e?.preventDefault();
-        if ((!inputText.trim() && !isTransactionMode) || isSending) return;
-        if (isTransactionMode && !amount) return;
+
+        // Validation based on mode
+        if (mode === 'message' && !inputText.trim()) return;
+        if (mode === 'transaction' && !amount) return;
+        if (isSending) return;
 
         setIsSending(true);
         try {
@@ -102,17 +78,17 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
                 content: inputText,
             };
 
-            if (isTransactionMode) {
+            if (mode === 'transaction') {
                 payload.amount = parseFloat(amount);
-                payload.description = description || inputText;
+                payload.description = description;
+                payload.transaction_type = type || 'pay';
             }
 
             const newMsg = await chatApi.sendMessage(payload);
-            addMessage(newMsg); // Optimistic update via hook
+            addMessage(newMsg);
 
-            // Scroll to bottom
+            // Scroll
             if (scrollRef.current) {
-                // Determine if we should smooth scroll?
                 setTimeout(() => {
                     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
                 }, 100);
@@ -122,7 +98,7 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
             setInputText("");
             setAmount("");
             setDescription("");
-            setIsTransactionMode(false);
+            // Keep current mode
         } catch (error) {
             console.error("Failed to send", error);
         } finally {
@@ -167,62 +143,92 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
 
             {/* Input Area */}
             <div className="p-4 bg-surface border-t border-border">
-                {isTransactionMode && (
-                    <div className="mb-4 p-4 bg-surface-muted rounded-xl border border-primary/20 animate-in slide-in-from-bottom-5">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-primary">New Expense</span>
-                            <button onClick={() => setIsTransactionMode(false)} className="text-xs text-text-muted hover:text-text">Cancel</button>
-                        </div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <DollarSign className="w-5 h-5 text-text-muted" />
+                {mode === 'transaction' ? (
+                    <div className="animate-in slide-in-from-bottom-2 fade-in duration-200">
+                        {/* Transaction Inputs (Permanent/Default) */}
+                        <div className="flex items-center gap-3 mb-4 px-2">
+                            <DollarSign className="w-6 h-6 text-primary" />
                             <input
                                 type="number"
                                 placeholder="0.00"
-                                className="bg-transparent text-2xl font-bold focus:outline-none w-full border-b border-border focus:border-primary"
+                                className="bg-transparent text-4xl font-bold focus:outline-none w-full border-none placeholder-text-muted/20"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                                 autoFocus
                             />
                         </div>
+
+                        <div className="mb-4 px-2">
+                            <input
+                                type="text"
+                                placeholder="Add a note (optional)..."
+                                className="w-full bg-transparent border-b border-border text-sm py-2 focus:outline-none focus:border-primary transition-colors placeholder:text-text-muted/50"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => handleSend(undefined, 'pay')}
+                                disabled={!amount}
+                                className="flex-1 py-3 bg-primary text-text-on-primary rounded-xl font-medium hover:bg-primary-hover disabled:opacity-50 transition-colors flex justify-center items-center gap-2"
+                            >
+                                <ArrowUpRight className="w-5 h-5" />
+                                <span>I Paid</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleSend(undefined, 'request')}
+                                disabled={!amount}
+                                className="flex-1 py-3 bg-surface-muted border border-border text-text rounded-xl font-medium hover:bg-border disabled:opacity-50 transition-colors flex justify-center items-center gap-2"
+                            >
+                                <ArrowDownLeft className="w-5 h-5" />
+                                <span>I Request</span>
+                            </button>
+
+                            {/* Switch to Message Mode */}
+                            <button
+                                type="button"
+                                onClick={() => setMode('message')}
+                                className="p-3 bg-surface-muted text-text-muted hover:text-text hover:bg-border rounded-xl transition-colors"
+                                title="Send Message"
+                            >
+                                <MessageSquare className="w-6 h-6" />
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <form onSubmit={(e) => handleSend(e)} className="flex gap-2 animate-in slide-in-from-bottom-2 fade-in duration-200">
+                        {/* Switch Back to Transaction */}
+                        <button
+                            type="button"
+                            onClick={() => setMode('transaction')}
+                            className="p-3 bg-surface-muted text-text hover:bg-border rounded-full transition-colors"
+                            title="Back to Transaction"
+                        >
+                            <DollarSign className="w-5 h-5" />
+                        </button>
+
                         <input
                             type="text"
-                            placeholder="What for? (Description)"
-                            className="w-full bg-transparent text-sm p-2 focus:outline-none"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            className="flex-1 bg-surface-muted border-0 rounded-full px-4 text-text focus:ring-2 focus:ring-primary focus:outline-none placeholder-text-muted"
+                            placeholder="Type a message..."
+                            value={inputText}
+                            onChange={(e) => setInputText(e.target.value)}
+                            autoFocus
                         />
-                    </div>
+
+                        <button
+                            type="submit"
+                            disabled={!inputText.trim()}
+                            className="p-3 bg-primary text-text-on-primary rounded-full hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                        </button>
+                    </form>
                 )}
-
-                <form onSubmit={handleSend} className="flex gap-2">
-                    <button
-                        type="button"
-                        onClick={() => setIsTransactionMode(!isTransactionMode)}
-                        className={cn(
-                            "p-3 rounded-full transition-colors",
-                            isTransactionMode ? "bg-primary text-text-on-primary" : "bg-surface-muted text-text hover:bg-border"
-                        )}
-                        title="Add Transaction"
-                    >
-                        <DollarSign className="w-5 h-5" />
-                    </button>
-
-                    <input
-                        type="text"
-                        className="flex-1 bg-surface-muted border-0 rounded-full px-4 text-text focus:ring-2 focus:ring-primary focus:outline-none placeholder-text-muted"
-                        placeholder={isTransactionMode ? "Add a note..." : "Type a message..."}
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                    />
-
-                    <button
-                        type="submit"
-                        disabled={!inputText.trim() && !amount}
-                        className="p-3 bg-primary text-text-on-primary rounded-full hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                        {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                    </button>
-                </form>
             </div>
         </div>
     );

@@ -1,5 +1,19 @@
 # Changelog
 
+## [2025-12-14 17:05] feat(ledger): implement transaction workflow with confirmation
+**Summary:** Implemented a robust Transaction Workflow with "Pay vs Request" logic and a security-focused "Confirmation Loop". Counterparties must explicitly Confirm or Reject transactions. The Chat UI was refactored to be "Transaction-First", making financial actions the primary interaction mode.
+**Backend Changes:**
+* `backend/ledger/models.py`: Added `status` (PENDING, CONFIRMED, REJECTED) and `created_by` fields to `Transaction`.
+* `backend/ledger/views.py`: Updated `send_message` to handle transaction types. Added `confirm_transaction` and `reject_transaction` endpoints with security checks.
+* `backend/ledger/serializers.py`: Exposed `status` and `created_by` in API responses.
+**Frontend Changes:**
+* `frontend/src/features/Chat/components/ChatWindow.tsx`: Major UI Refactor: "Transaction Mode" is now default. Added Message/Transaction toggles.
+* `frontend/src/features/Chat/components/MessageBubble.tsx`: Added Status Badges (Yellow/Green/Red) and Action Buttons (Confirm/Reject) for counterparties.
+* `frontend/src/features/Chat/api.ts`: Added `confirmTransaction` and `rejectTransaction` methods.
+* `frontend/src/features/Chat/types.ts`: Updated `Transaction` and `SendMessagePayload` interfaces.
+**Documentation:**
+* `Docs/SRS.md`: Updated to v0.3.0, documenting the new Transaction Workflow and UI specs.
+
 ## [2025-12-14 13:50] feat(chat): implement polling, lazy loading & refactor imports
 **Summary:** Implemented "Near Real-Time" messaging using a Polling Strategy (3s interval) combined with "Lazy Loading" for history (Pagination). Major refactor of Frontend Chat architecture to use Custom Hooks and Absolute Imports.
 **Backend Changes:**

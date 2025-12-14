@@ -14,6 +14,18 @@ class Transaction(models.Model):
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Workflow
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        CONFIRMED = "CONFIRMED", "Confirmed"
+        REJECTED = "REJECTED", "Rejected"
+
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+
+    # Who initiated this?
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_transactions", null=False)
+
     is_deleted = models.BooleanField(default=False)
 
     def __str__(self):

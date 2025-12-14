@@ -4,8 +4,10 @@ export interface Transaction {
     id: number;
     payer: User;
     recipient: User;
+    created_by: User;
     amount: string; // Decimal string from backend
     description: string;
+    status: "PENDING" | "CONFIRMED" | "REJECTED";
     created_at: string;
 }
 
@@ -29,6 +31,7 @@ export interface SendMessagePayload {
     content?: string;
     amount?: number;
     description?: string;
+    transaction_type?: "pay" | "request";
 }
 
 export interface PaginatedResponse<T> {
