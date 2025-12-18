@@ -1,4 +1,4 @@
-from core.serializers import UserSerializer
+from core.serializers import PublicUserSerializer
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework import permissions, status, viewsets
@@ -46,7 +46,7 @@ class ChatViewSet(viewsets.ViewSet):
             other_user = msg.recipient if msg.sender == user else msg.sender
             if other_user.id not in seen_users:
                 seen_users.add(other_user.id)
-                chats.append({"user": UserSerializer(other_user).data, "last_message": MessageSerializer(msg).data})
+                chats.append({"user": PublicUserSerializer(other_user).data, "last_message": MessageSerializer(msg).data})
 
         return Response(chats)
 

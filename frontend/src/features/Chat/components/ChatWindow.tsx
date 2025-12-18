@@ -150,10 +150,24 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
                             <DollarSign className="w-6 h-6 text-primary" />
                             <input
                                 type="number"
+                                min="0.00"
+                                step="1"
                                 placeholder="0.00"
                                 className="bg-transparent text-4xl font-bold focus:outline-none w-full border-none placeholder-text-muted/20"
                                 value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    // Prevent negative signs or invalid chars, keep it simple
+                                    if (val === '' || parseFloat(val) >= 0) {
+                                        setAmount(val);
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    // Prevent minus sign
+                                    if (e.key === '-') {
+                                        e.preventDefault();
+                                    }
+                                }}
                                 autoFocus
                             />
                         </div>
@@ -172,7 +186,7 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
                             <button
                                 type="button"
                                 onClick={() => handleSend(undefined, 'pay')}
-                                disabled={!amount}
+                                disabled={!amount || parseFloat(amount) <= 0}
                                 className="flex-1 py-3 bg-primary text-text-on-primary rounded-xl font-medium hover:bg-primary-hover disabled:opacity-50 transition-colors flex justify-center items-center gap-2"
                             >
                                 <ArrowUpRight className="w-5 h-5" />
@@ -181,7 +195,7 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
                             <button
                                 type="button"
                                 onClick={() => handleSend(undefined, 'request')}
-                                disabled={!amount}
+                                disabled={!amount || parseFloat(amount) <= 0}
                                 className="flex-1 py-3 bg-surface-muted border border-border text-text rounded-xl font-medium hover:bg-border disabled:opacity-50 transition-colors flex justify-center items-center gap-2"
                             >
                                 <ArrowDownLeft className="w-5 h-5" />

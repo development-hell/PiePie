@@ -1,5 +1,17 @@
 # Changelog
 
+## [2025-12-18 22:50] feat(core): implement robust data privacy and transaction validation
+**Summary:** Implemented strict data privacy measures by splitting `UserSerializer` into `Public` and `Private` variants, ensuring that sensitive data (email, phone) is never exposed to counterparties. Added robust validation for transactions to reject negative or zero amounts at both the UI and API levels.
+**Backend Changes:**
+* `backend/core/serializers.py`: Refactored `UserSerializer` into `PrivateUserSerializer` (Owner) and `PublicUserSerializer` (Safe). Updated `ContactSerializer`.
+* `backend/core/views.py`: Updated `UserDataView` to use `PrivateUserSerializer`.
+* `backend/ledger/serializers.py`: Updated `Transaction` and `Message` serializers to use `PublicUserSerializer`. Added amount validation (>0).
+**Frontend Changes:**
+* `frontend/src/features/Chat/components/ChatWindow.tsx`: Input validation prevents negative values; disables buttons for invalid amounts.
+**Documentation:**
+* `Docs/SRS.md`: Added "Privacy & Security" and "Validation" sections.
+* `README.md`: Highlighted "Data Privacy" and "Robust Validation" features.
+
 ## [2025-12-14 17:05] feat(ledger): implement transaction workflow with confirmation
 **Summary:** Implemented a robust Transaction Workflow with "Pay vs Request" logic and a security-focused "Confirmation Loop". Counterparties must explicitly Confirm or Reject transactions. The Chat UI was refactored to be "Transaction-First", making financial actions the primary interaction mode.
 **Backend Changes:**

@@ -3,7 +3,7 @@ from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.response import Response
 
 from .models import Contact
-from .serializers import AddContactSerializer, ContactSerializer, UserRegistrationSerializer, UserSerializer
+from .serializers import AddContactSerializer, ContactSerializer, PrivateUserSerializer, UserRegistrationSerializer
 
 
 class RegisterView(generics.CreateAPIView):
@@ -13,7 +13,7 @@ class RegisterView(generics.CreateAPIView):
 
 class UserDataView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserSerializer
+    serializer_class = PrivateUserSerializer
 
     def get_object(self):
         return self.request.user

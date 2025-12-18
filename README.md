@@ -102,6 +102,8 @@ PiePie/
     *   **Mobile:** App-like Full-screen experience with Collapsible Drawer.
     *   **Desktop:** "Holy Grail" layout with **Collapsible/Pinnable Sidebar** (`w-20` <-> `w-56`).
 *   **👤 User Profile:** Manage session via Navbar dropdown.
+*   **🔒 Data Privacy:** Strict "Public vs Private" data separation. Emails/Phones are never exposed to other users.
+*   **✅ Robust Validation:** Server-side and Client-side checks (e.g., Positive-only transaction amounts).
 
 ---
 

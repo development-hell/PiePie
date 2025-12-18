@@ -27,15 +27,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserSerializer(serializers.ModelSerializer):
+class PrivateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email", "first_name", "last_name", "phone_number", "profile_photo"]
         read_only_fields = ["email", "phone_number"]
 
 
+class PublicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "first_name", "last_name", "profile_photo"]
+
+
 class ContactSerializer(serializers.ModelSerializer):
-    contact = UserSerializer(read_only=True)
+    contact = PublicUserSerializer(read_only=True)
 
     class Meta:
         model = Contact

@@ -76,6 +76,11 @@ The application is divided into two distinct zones with specific layouts:
         *   **Security**: Initiator cannot approve their own requests.
     *   Create, read, update, delete transactions.
 *   **Entity Management**: Manage Contacts, Groups, and Accounts.
+*   **Privacy & Security**:
+    *   **Data Minimization**: Public endpoints (Contact Search, Chat Recipients) only expose `username`, `first_name`, `last_name`, and `profile_photo`.
+    *   **Field Restricted**: `email` and `phone_number` are strictly private to the owner.
+*   **Validation**:
+    *   **Positive Values**: Transaction amounts must be strictly positive (> 0). Negative values are rejected at both UI and API levels.
 *   **Ledger Calculation**: Automated balancing of shared expenses.
 
 ### 3.3 Data Inputs/Outputs

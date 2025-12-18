@@ -1,14 +1,14 @@
 from core.models import User
-from core.serializers import UserSerializer
+from core.serializers import PublicUserSerializer
 from rest_framework import serializers
 
 from .models import Message, Transaction
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    payer = UserSerializer(read_only=True)
-    recipient = UserSerializer(read_only=True)
-    created_by = UserSerializer(read_only=True)
+    payer = PublicUserSerializer(read_only=True)
+    recipient = PublicUserSerializer(read_only=True)
+    created_by = PublicUserSerializer(read_only=True)
 
     payer_id = serializers.PrimaryKeyRelatedField(source="payer", queryset=User.objects.all(), write_only=True)
     recipient_id = serializers.PrimaryKeyRelatedField(source="recipient", queryset=User.objects.all(), write_only=True)
@@ -19,7 +19,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
+    sender = PublicUserSerializer(read_only=True)
     # We might not need full recipient details in every message if we know the context
     transaction = TransactionSerializer(read_only=True)
 
@@ -40,4 +40,8 @@ class CreateMessageSerializer(serializers.Serializer):
     def validate(self, data):
         if not data.get("content") and not data.get("amount"):
             raise serializers.ValidationError("Must provide either content or transaction amount.")
+
+        if data.get("amount") is not None and data["amount"] <= 0:
+            raise serializers.ValidationError({"amount": "Transaction amount must be positive."})
+
         return data
