@@ -1,6 +1,10 @@
+import datetime
+
 from core.serializers import PublicUserSerializer
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Q, Sum
+from django.db.models.functions import TruncDate
+from django.utils import timezone
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -190,3 +194,100 @@ class ChatViewSet(viewsets.ViewSet):
         txn.status = Transaction.Status.REJECTED
         txn.save()
         return Response({"status": "rejected"})
+
+
+class DashboardViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=["get"])
+    def stats(self, request):
+        """
+        Returns aggregated stats:
+        - total_sent: Confirmed payments made by user
+        - total_received: Confirmed payments received by user
+        - pending_action_count: Transactions waiting for user's action
+        """
+        user = request.user
+
+        # 1. Totals (Confirmed only)
+        # Sent: User is payer
+        total_sent = Transaction.objects.filter(payer=user, status=Transaction.Status.CONFIRMED).aggregate(total=Sum("amount"))["total"] or 0
+
+        # Received: User is recipient
+        total_received = Transaction.objects.filter(recipient=user, status=Transaction.Status.CONFIRMED).aggregate(total=Sum("amount"))["total"] or 0
+
+        # 2. Pending Actions (Where user needs to act)
+        # - Received a REQUEST (user is payer, status pending)
+        # - Received a PAYMENT to confirm (user is recipient, status pending)
+        # Wait, per 'confirm_transaction' logic:
+        # "Only the user who DID NOT create it can confirm it"
+        # So we check if user is NOT created_by AND is involved.
+        pending_count = (
+            Transaction.objects.filter(status=Transaction.Status.PENDING).filter(Q(payer=user) | Q(recipient=user)).exclude(created_by=user).count()
+        )
+
+        return Response({"total_sent": total_sent, "total_received": total_received, "pending_action_count": pending_count})
+
+    @action(detail=False, methods=["get"])
+    def activity(self, request):
+        """
+        Returns top 10 most recent transactions across all chats.
+        """
+        user = request.user
+        # All transactions involving user
+        recent_txns = (
+            Transaction.objects.filter(Q(payer=user) | Q(recipient=user))
+            .select_related("payer", "recipient", "created_by")
+            .order_by("-created_at")[:10]
+        )
+
+        from .serializers import TransactionSerializer
+
+        return Response(TransactionSerializer(recent_txns, many=True).data)
+
+    @action(detail=False, methods=["get"])
+    def graph_data(self, request):
+        """
+        Returns time-series data for graphs.
+        Params:
+        - filter: 'all' (default), 'sent', 'received'
+        - range: '7d' (default), '30d', '90d', '1y'
+        """
+        user = request.user
+        filter_type = request.query_params.get("filter", "all")
+        range_param = request.query_params.get("range", "7d")
+
+        # 1. Determine Date Range
+        now = timezone.now()
+        if range_param == "30d":
+            start_date = now - datetime.timedelta(days=30)
+        elif range_param == "90d":
+            start_date = now - datetime.timedelta(days=90)
+        elif range_param == "1y":
+            start_date = now - datetime.timedelta(days=365)
+        else:  # 7d
+            start_date = now - datetime.timedelta(days=7)
+
+        # 2. Base Query (Confirmed Only)
+        queryset = Transaction.objects.filter(status=Transaction.Status.CONFIRMED, created_at__gte=start_date)
+
+        # 3. Apply Filter
+        if filter_type == "sent":
+            queryset = queryset.filter(payer=user)
+        elif filter_type == "received":
+            queryset = queryset.filter(recipient=user)
+        elif filter_type == "owned":
+            queryset = queryset.filter(created_by=user)
+        elif filter_type == "not_owned":
+            queryset = queryset.exclude(created_by=user)
+        else:
+            queryset = queryset.filter(Q(payer=user) | Q(recipient=user))
+
+        # 4. Aggregation by Date
+        # We want a list of { date: 'YYYY-MM-DD', amount: X }
+        # TruncDate is useful here.
+
+        data = queryset.annotate(date=TruncDate("created_at")).values("date").annotate(amount=Sum("amount")).order_by("date")
+
+        # Limit valid return format
+        return Response(list(data))

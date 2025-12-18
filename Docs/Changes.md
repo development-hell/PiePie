@@ -1,5 +1,25 @@
 # Changelog
 
+## [2025-12-19 00:41] feat(dashboard): implement financial dashboard with trends and activity feed
+**Summary:** Implemented a comprehensive Dashboard providing users with a high-level view of their finances. Features include KPI Stats (Totals), an interactive Trend Graph (powered by Recharts) with filters (Time Range, Transaction Type, Ownership), and a unified Activity Feed. Added global Skeleton loading states and fixed Theme toggle issues for dark mode.
+**Backend Changes:**
+* `backend/ledger/views.py`: [NEW] `DashboardViewSet` with `stats`, `activity`, and `graph_data` endpoints. Implemented filtering logic (owned/not_owned).
+* `backend/ledger/urls.py`: Registered `/dashboard/` route.
+**Frontend Changes:**
+* `frontend/src/features/Dashboard/`: [NEW] Feature module containing:
+    * `pages/DashboardPage.tsx`: Main layout.
+    * `components/TrendGraph.tsx`: Interactive chart with Recharts (Line/Bar/Pie) and filters.
+    * `components/StatsOverview.tsx`: Summary cards.
+    * `components/ActivityFeed.tsx`: Recent transactions list.
+    * `api.ts`: API service definition.
+* `frontend/src/components/Skeleton.tsx`: [NEW] Added global Skeleton component.
+* `frontend/src/components/layout/Sidebar.tsx`: Added Dashboard navigation item.
+* `frontend/src/App.tsx`: Added `/app/dashboard` route.
+* `frontend/src/index.css`: Fixed Dark Mode variable resolution for Recharts.
+**Documentation:**
+* `Docs/SRS.md`: Updated with Dashboard feature specs and Recharts dependency.
+* `README.md`: Added "Finance Dashboard" to features list.
+
 ## [2025-12-18 22:50] feat(core): implement robust data privacy and transaction validation
 **Summary:** Implemented strict data privacy measures by splitting `UserSerializer` into `Public` and `Private` variants, ensuring that sensitive data (email, phone) is never exposed to counterparties. Added robust validation for transactions to reject negative or zero amounts at both the UI and API levels.
 **Backend Changes:**

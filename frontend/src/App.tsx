@@ -1,14 +1,14 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
-import { LandingPage } from "@/pages/LandingPage";
+import { PublicLayout } from "@/components/layout/PublicLayout";
+import { PublicOnly, RequireAuth } from "@/components/RouteGuards";
 import { LoginPage } from "@/features/Auth/pages/LoginPage";
 import { RegisterPage } from "@/features/Auth/pages/RegisterPage";
-import { RequireAuth, PublicOnly } from "@/components/RouteGuards";
-import { SettingsPage } from "@/features/Settings/pages/SettingsPage";
-import { ContactsPage } from "@/features/Contacts/pages/ContactsPage";
-
 import { ChatsPage } from "@/features/Chat/pages/ChatsPage";
+import { ContactsPage } from "@/features/Contacts/pages/ContactsPage";
+import { DashboardPage } from "@/features/Dashboard/pages/DashboardPage";
+import { SettingsPage } from "@/features/Settings/pages/SettingsPage";
+import { LandingPage } from "@/pages/LandingPage";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 function App() {
   return (
@@ -31,6 +31,7 @@ function App() {
           <Route path="chats" element={<ChatsPage />} />
           <Route path="chats/:username" element={<ChatsPage />} />
           <Route path="contacts" element={<ContactsPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>

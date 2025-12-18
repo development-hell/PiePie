@@ -25,6 +25,7 @@ PiePie is a unified personal finance application designed to merge personal expe
 *   **Styling:** Tailwind CSS v4 (Variable-based theming)
 *   **Routing:** React Router DOM 7
 *   **State:** React Context API (Auth), Axios (API Client)
+*   **Visualization:** Recharts
 
 ---
 
@@ -96,6 +97,10 @@ PiePie/
 *   **💸 Transaction Ledger:**
     *   Record expenses/payments with contacts.
     *   Smart splitting logic (Basic).
+*   **📊 Finance Dashboard:**
+    *   **KPI Cards:** Track Total Sent, Received, and Pending Actions.
+    *   **Trend Graphs:** Interactive charts (Line/Bar/Pie) with Time & Filter controls.
+    *   **Activity Feed:** Monitor recent transaction history.
 *   **🛡️ Route Protection:** Check authentication state before accessing private routes (`/app/*`).
 *   **🎨 Dynamic Theming:** Light/Dark mode support using CSS Variables & Tailwind v4.
 *   **📱 Responsive Layouts:**

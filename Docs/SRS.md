@@ -82,6 +82,11 @@ The application is divided into two distinct zones with specific layouts:
 *   **Validation**:
     *   **Positive Values**: Transaction amounts must be strictly positive (> 0). Negative values are rejected at both UI and API levels.
 *   **Ledger Calculation**: Automated balancing of shared expenses.
+*   **Dashboard**:
+    *   **Financial Overview**: High-level stats (Total Sent, Total Received, Pending Actions).
+    *   **Trend Analysis**: Interactive graph (Line/Bar/Pie) illustrating spending history over time (7d, 30d, 90d, 1y).
+        *   **Filters**: View 'All', 'Sent', 'Received', 'My Requests' (Owned), or 'Others Requests' (Not Owned).
+    *   **Activity Feed**: Unified chronological stream of recent transactions.
 
 ### 3.3 Data Inputs/Outputs
 *   **Inputs**: User credentials, transaction amounts, dates, descriptions, split details.
@@ -108,7 +113,7 @@ The application is divided into two distinct zones with specific layouts:
 | :--- | :--- | :--- | :--- |
 | **Backend** | **Python (>=3.13)** | `uv` | Modern runtime. |
 | **API Framework** | **Django (>=6.0)** & **DRF** | `simplejwt`, `Pillow` | **Django Rest Framework** for API. `simplejwt` for Auth. |
-| **Frontend** | **React.js (^19.2.0)** | **Vite (^7.2.4)** | TypeScript (~5.9.3), Tailwind CSS v4. |
+| **Frontend** | **React.js (^19.2.0)** | **Vite (^7.2.4)** | TypeScript (~5.9.3), Tailwind CSS v4. **Recharts** for graphs. |
 | **Database** | **PostgreSQL** | - | Required for complex relationship modeling. |
 | **Mobile** | **React Native** | - | Future target, sharing logic with web. |
 
