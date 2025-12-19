@@ -1,6 +1,15 @@
 # Changelog
 
-## [2025-12-19 08:00] feat(chat): refine chat window header with display names and navigation controls
+## [2025-12-19 09:00] feat(contacts): refactor layout to table and fix settings toggles
+**Summary:** Refactored the Contacts Page from a grid to a cleaner tabular layout with a serial number column and direct action buttons. Also fixed a bug in the Contact Settings Modal where toggle switches were unresponsive due to a syntax error.
+**Frontend Changes:**
+* `src/features/Contacts/pages/ContactsPage.tsx`:
+    *   [Refactor] Switched to Table layout. Columns: # (Index), Name, Username, Actions.
+    *   [Feat] Added "Message" action button to quickly jump to chat.
+* `src/features/Contacts/components/ContactSettingsModal.tsx`:
+    *   [Fix] Corrected template literal syntax (`\${` -> `${`) to fix toggle button state styling.
+**Documentation:**
+* `Docs/SRS.md`: Updated Contacts Page UI specs.
 **Summary:** Enhanced the Chat Window UI to be more app-like and user-friendly. The header now includes a functional Back button (essential for mobile/desktop navigation), the user's Profile Photo (with a fallback icon), and a Display Name that prioritizes "First Last" over "@username". Added a context menu placeholder.
 **Frontend Changes:**
 * `src/features/Chat/components/ChatWindow.tsx`:

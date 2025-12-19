@@ -2,7 +2,7 @@ import type { Contact } from "@/features/Contacts/api";
 import { contactsApi } from "@/features/Contacts/api";
 import { AddContactModal } from "@/features/Contacts/components/AddContactModal";
 import { ContactSettingsModal } from "@/features/Contacts/components/ContactSettingsModal";
-import { Plus, Settings, Trash2, User as UserIcon } from "lucide-react";
+import { MessageSquare, Plus, Settings, Trash2, User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -95,59 +95,95 @@ export function ContactsPage() {
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {contacts.map((item) => (
-                            <div
-                                key={item.id}
-                                onClick={() => navigate(`/app/chats/${item.contact.username}`)}
-                                className="group flex items-center p-4 bg-surface border border-border rounded-xl hover:shadow-md transition-all duration-200 cursor-pointer"
-                            >
-                                {/* Avatar */}
-                                <div className="flex-shrink-0 mr-4">
-                                    {item.contact.profile_photo ? (
-                                        <img
-                                            src={item.contact.profile_photo}
-                                            alt={item.contact.username}
-                                            className="w-12 h-12 rounded-full object-cover border border-border"
-                                        />
-                                    ) : (
-                                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
-                                            {item.contact.first_name[0]?.toUpperCase() || item.contact.username[0]?.toUpperCase()}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Info */}
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="text-base font-semibold truncate">
-                                        {item.contact.first_name} {item.contact.last_name}
-                                    </h3>
-                                    <p className="text-sm text-text-muted truncate">@{item.contact.username}</p>
-                                    {/* Status Badges */}
-                                    <div className="flex gap-1 mt-1">
-                                        {!item.allow_transactions && <span className="text-[10px] bg-surface-danger-muted text-text-danger px-1.5 py-0.5 rounded">Blocked</span>}
-                                    </div>
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={() => openSettings(item)}
-                                        className="p-2 text-text-muted hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
-                                        title="Settings"
+                    <div className="border border-border rounded-xl overflow-hidden bg-surface shadow-sm">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-surface-muted border-b border-border">
+                                <tr>
+                                    <th className="px-6 py-4 font-semibold text-text-muted w-16">#</th>
+                                    <th className="px-6 py-4 font-semibold text-text-muted">Name</th>
+                                    <th className="px-6 py-4 font-semibold text-text-muted">Username</th>
+                                    <th className="px-6 py-4 font-semibold text-text-muted text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {contacts.map((item, index) => (
+                                    <tr
+                                        key={item.id}
+                                        onClick={() => navigate(`/app/contacts/${item.id}`)}
+                                        className="group hover:bg-surface-muted/50 transition-colors cursor-pointer"
                                     >
-                                        <Settings className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(item.id)}
-                                        className="p-2 text-text-muted hover:text-text-danger hover:bg-surface-danger-muted rounded-full transition-colors"
-                                        title="Remove Contact"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                                        <td className="px-6 py-4 text-text-muted font-medium">
+                                            {index + 1}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                {/* Avatar */}
+                                                <div className="flex-shrink-0">
+                                                    {item.contact.profile_photo ? (
+                                                        <img
+                                                            src={item.contact.profile_photo}
+                                                            alt={item.contact.username}
+                                                            className="w-10 h-10 rounded-full object-cover border border-border"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                                                            {item.contact.first_name[0]?.toUpperCase() || item.contact.username[0]?.toUpperCase()}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-text">
+                                                        {item.contact.first_name} {item.contact.last_name}
+                                                    </div>
+                                                    {!item.allow_transactions && (
+                                                        <span className="inline-flex mt-1 items-center px-1.5 py-0.5 rounded text-xs font-medium bg-surface-danger-muted text-text-danger">
+                                                            Blocked
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-text-muted">
+                                            @{item.contact.username}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/app/chats/${item.contact.username}`);
+                                                    }}
+                                                    className="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors"
+                                                    title="Message"
+                                                >
+                                                    <MessageSquare className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        openSettings(item);
+                                                    }}
+                                                    className="p-2 text-text-muted hover:text-text hover:bg-surface-muted rounded-full transition-colors"
+                                                    title="Settings"
+                                                >
+                                                    <Settings className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDelete(item.id);
+                                                    }}
+                                                    className="p-2 text-text-muted hover:text-text-danger hover:bg-surface-danger-muted rounded-full transition-colors"
+                                                    title="Remove Contact"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>

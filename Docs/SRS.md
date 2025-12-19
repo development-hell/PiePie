@@ -38,6 +38,11 @@ The application is divided into two distinct zones with specific layouts:
     *   **Chat Window**:
         *   **Header**: Contains Back Button (returns to list), User Avatar (with initials fallback), Display Name (First Last > Username), and Context Menu.
         *   **Display Name Logic**: Prioritizes `First Name Last Name`. Falls back to `@username` if names are missing.
+    *   **Contacts Page**:
+        *   **Layout**: Tabular list view for better organization.
+        *   **Columns**: # (Serial Number), Name (w/ Avatar), Username, Actions.
+        *   **Actions**: Message (Jump to chat), Settings, Delete.
+        *   **Interaction**: Row click navigates to Contact Detail view.
     *   **Sidebar**:
         *   **Desktop**:
             *   **Default**: Collapsed (`w-20`), displaying icons only.

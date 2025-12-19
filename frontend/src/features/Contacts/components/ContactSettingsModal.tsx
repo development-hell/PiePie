@@ -56,13 +56,11 @@ export function ContactSettingsModal({ contact, isOpen, onClose, onUpdate }: Con
                         <button
                             onClick={() => handleToggle('allow_transactions')}
                             disabled={loading}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 \${
-                        contact.allow_transactions ? 'bg-primary' : 'bg-surface-muted border border-border'
-                    }`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${contact.allow_transactions ? 'bg-primary' : 'bg-surface-muted border border-border'
+                                }`}
                         >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform \${
-                        contact.allow_transactions ? 'translate-x-6' : 'translate-x-1'
-                    }`} />
+                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${contact.allow_transactions ? 'translate-x-6' : 'translate-x-1'
+                                }`} />
                         </button>
                     </div>
 
@@ -75,13 +73,11 @@ export function ContactSettingsModal({ contact, isOpen, onClose, onUpdate }: Con
                         <button
                             onClick={() => handleToggle('auto_accept_transactions')}
                             disabled={loading}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 \${
-                        contact.auto_accept_transactions ? 'bg-primary' : 'bg-surface-muted border border-border'
-                    }`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${contact.auto_accept_transactions ? 'bg-primary' : 'bg-surface-muted border border-border'
+                                }`}
                         >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform \${
-                        contact.auto_accept_transactions ? 'translate-x-6' : 'translate-x-1'
-                    }`} />
+                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${contact.auto_accept_transactions ? 'translate-x-6' : 'translate-x-1'
+                                }`} />
                         </button>
                     </div>
 
