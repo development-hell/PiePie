@@ -10,6 +10,8 @@
     *   [Fix] Corrected template literal syntax (`\${` -> `${`) to fix toggle button state styling.
 **Documentation:**
 * `Docs/SRS.md`: Updated Contacts Page UI specs.
+
+## [2025-12-19 08:00] feat(chat): refine chat window header with display names and navigation controls
 **Summary:** Enhanced the Chat Window UI to be more app-like and user-friendly. The header now includes a functional Back button (essential for mobile/desktop navigation), the user's Profile Photo (with a fallback icon), and a Display Name that prioritizes "First Last" over "@username". Added a context menu placeholder.
 **Frontend Changes:**
 * `src/features/Chat/components/ChatWindow.tsx`:
