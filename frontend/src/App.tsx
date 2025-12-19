@@ -4,10 +4,12 @@ import { PublicOnly, RequireAuth } from "@/components/RouteGuards";
 import { LoginPage } from "@/features/Auth/pages/LoginPage";
 import { RegisterPage } from "@/features/Auth/pages/RegisterPage";
 import { ChatsPage } from "@/features/Chat/pages/ChatsPage";
+import { ContactDetailPage } from "@/features/Contacts/pages/ContactDetailPage";
 import { ContactsPage } from "@/features/Contacts/pages/ContactsPage";
 import { DashboardPage } from "@/features/Dashboard/pages/DashboardPage";
 import { SettingsPage } from "@/features/Settings/pages/SettingsPage";
 import { LandingPage } from "@/pages/LandingPage";
+import { NotFoundPage } from "@/pages/NotFoundPage";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -31,13 +33,14 @@ function App() {
           <Route path="chats" element={<ChatsPage />} />
           <Route path="chats/:username" element={<ChatsPage />} />
           <Route path="contacts" element={<ContactsPage />} />
+          <Route path="contacts/:id" element={<ContactDetailPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>
 
       {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

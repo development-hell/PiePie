@@ -8,6 +8,8 @@ export function useChatMessages(recipientUsername: string) {
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     
+    const [error, setError] = useState<number | null>(null);
+
     // Refs for state that shouldn't trigger re-renders or for closure safety
     const pageRef = useRef(1);
     const messagesRef = useRef<Message[]>([]);
@@ -25,6 +27,7 @@ export function useChatMessages(recipientUsername: string) {
             
             setIsLoading(true);
             setMessages([]);
+            setError(null);
             pageRef.current = 1;
             setHasMore(true);
 
@@ -36,8 +39,13 @@ export function useChatMessages(recipientUsername: string) {
                     setMessages(initialMessages);
                     setHasMore(!!response.next);
                 }
-            } catch (error) {
-                console.error("Failed to load messages", error);
+            } catch (err: any) {
+                console.error("Failed to load messages", err);
+                if (err.response && err.response.status === 404) {
+                    setError(404);
+                } else {
+                    setError(500);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -121,6 +129,7 @@ export function useChatMessages(recipientUsername: string) {
         isLoadingHistory,
         hasMore,
         loadMore,
-        addMessage
+        addMessage,
+        error
     };
 }

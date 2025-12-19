@@ -58,6 +58,9 @@ The application is divided into two distinct zones with specific layouts:
 **Theme Support**:
 *   **Light/Dark Mode**: The application will support both light and dark themes.
 *   **Implementation**: Toggle via Navbar. Uses **Tailwind v4 CSS variables** (`--color-surface`, `--color-text`) defined in `index.css`. Manual `dark:` utility classes are **forbidden** in components.
+*   **Error Handling**:
+    *   **Consistent 404s**: All "Not Found" states (Generic, User, Contact) must provide consistent navigation options: "Go Back", "Go Home", and "Dashboard".
+    *   **Contextual Feedback**: Error pages should clearly state *what* was not found (e.g., "User @foo not found").
 
 **Main Views / URLs**:
 1.  **Landing Page / Home**: Public marketing page explaining features.
@@ -84,6 +87,7 @@ The application is divided into two distinct zones with specific layouts:
         *   **Security**: Initiator cannot approve their own requests.
     *   Create, read, update, delete transactions.
 *   **Entity Management**: Manage Contacts, Groups, and Accounts.
+    *   **Strict URL Validation**: ID parameters in URLs (e.g., `/contacts/:id`) must be strictly numeric. Non-numeric IDs (e.g., `123v`) must trigger an immediate 404 error.
 *   **Privacy & Security**:
     *   **Data Minimization**: Public endpoints (Contact Search, Chat Recipients) only expose `username`, `first_name`, `last_name`, and `profile_photo`.
     *   **Field Restricted**: `email` and `phone_number` are strictly private to the owner.
@@ -177,6 +181,7 @@ This project enforces strict development guidelines to ensure maintainability an
     *   **Skeletons**: Use Skeleton loaders instead of full-screen spinners.
     *   **Functional**: Use React Functional Components with strict TS interfaces.
     *   **Imports**: Use Absolute Imports (`@/features/...`) exclusively.
+    *   **Design Patterns**: Use **Container/Presenter** pattern for complex logic (e.g., ChatWindow). Separate Data/Error logic (Container) from UI/Rendering logic (Presenter) into distinct files.
 
 ### 5.3 Backend Standards (Django)
 *   **Data Safety**: **Soft Delete Only.**

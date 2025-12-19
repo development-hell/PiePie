@@ -1,60 +1,60 @@
-# PiePie - Backend API 🐍
+# PiePie Backend 🐍
 
-This directory contains the Django backend for the PiePie application. It handles authentication, transaction logic, and data persistence.
+The Django REST Framework API for the PiePie application.
 
-![Python](https://img.shields.io/badge/Python-3.13+-blue?logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-6.0+-092E20?logo=django&logoColor=white)
-![DRF](https://img.shields.io/badge/DRF-Latest-red)
-
-## 🛠️ Tech Stack
-*   **Framework:** Django 6.0+
-*   **API:** Django Rest Framework (DRF)
-*   **Authentication:** `djangorestframework-simplejwt` (JWT)
-*   **Database:** PostgreSQL (Production)
-*   **Package Manager:** `uv`
-*   **Image Processing:** `Pillow`
+![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-6.0-092E20?logo=django&logoColor=white)
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 *   Python 3.13+
-*   `uv` (Universal Python Package Manager)
+*   `uv` Package Manager
 
 ### Installation
+
 ```bash
-# 1. Install dependencies
+# 1. Install Dependencies
 uv sync
 
-# 2. Apply database migrations
+# 2. Run Migrations
 uv run python manage.py migrate
 
-# 3. Create a superuser (optional)
-uv run python manage.py createsuperuser
-
-# 4. Run the development server
+# 3. Start Server
 uv run python manage.py runserver
 ```
 
-The API will be available at `http://localhost:8000`.
+The API will run at `http://localhost:8000`.
 
-## 📂 Architecture
+---
 
-```
-backend/
-├── config/             # Project settings (settings.py, urls.py)
-├── core/               # Core App: User Model, Auth, Contacts
-│   ├── models.py       # Custom User model
-│   ├── views.py        # Auth & Profile endpoints
-│   └── serializers.py  # Public/Private User serializers
-├── ledger/             # Ledger App: Transactions & Chats
-│   ├── models.py       # Transaction, Message, Split models
-│   ├── views.py        # Dashboard, Chat, Transaction logic
-│   └── serializers.py  # Transaction serialization
-└── manage.py           # Django CLI
-```
+## 🏗️ Architecture
 
-## ✨ Key Features
-*   **JWT Auth:** Secure token-based access with refresh rotation.
-*   **Dashboard API:** Aggregated stats and time-series data for frontend graphs.
-*   **Transaction Workflow:** `PENDING` -> `CONFIRMED`/`REJECTED` state machine.
-*   **Privacy:** Strict separation of public user info (username, photo) vs private info (email, phone).
+The backend is structured into modular Django Apps.
+
+### Key Modules
+
+*   **`core/`**: Handles fundamental data.
+    *   **Custom User Model**: Extends `AbstractUser`.
+    *   **Contacts**: Manages `Contact` relationships using `symmetric=False`.
+*   **`ledger/`**: Handles the business logic.
+    *   **Transactions**: The core entity recording money movement.
+    *   **Splits**: (Future) Logic for multi-user bill splitting.
+
+### Security Features
+
+*   **JWT Authentication**: Stateless auth via `simplejwt`.
+*   **Soft Delete**: Data is never removed (`DELETE` SQL), only marked `is_deleted=True`.
+*   **Privacy Guard**: Public Serializers strictly exclude `email` and `phone_number`.
+
+---
+
+## 📝 API Overview
+
+| Endpoint | Method | Purpose |
+| :--- | :--- | :--- |
+| `/api/token/` | POST | Obtain Access/Refresh Token |
+| `/api/users/me/` | GET | Get generic profile |
+| `/api/contacts/` | GET | List all contacts |
+| `/api/ledger/transactions/` | POST | Create defined transaction |
+| `/api/ledger/dashboard/` | GET | Get stats summary |

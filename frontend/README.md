@@ -1,57 +1,68 @@
-# PiePie - Frontend Client ⚛️
+# PiePie Frontend 🥧
 
-This directory contains the React frontend for PiePie. It provides a responsive, app-like experience for managing personal finances.
+The React client for the PiePie personal finance application.
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-7.0-646CFF?logo=vite&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css&logoColor=white)
 
-## 🛠️ Tech Stack
-*   **Core:** React 19, TypeScript
-*   **Build Tool:** Vite 7
-*   **Styling:** Tailwind CSS v4 (with CSS Variables)
-*   **Routing:** React Router DOM 7
-*   **State Management:** React Context (Auth), Local State
-*   **Data Fetching:** Axios (with Interceptors)
-*   **Visualization:** Recharts
-*   **Icons:** Lucide React
-
 ## 🚀 Getting Started
 
 ### Prerequisites
 *   Node.js v20+
-*   npm
+*   `npm` or `pnpm`
 
 ### Installation
+
 ```bash
 # 1. Install dependencies
 npm install
 
-# 2. Run the development server
+# 2. Start Development Server
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`.
+The app will run at `http://localhost:5173`.
 
-## 📂 Architecture
+---
+
+## 🏗️ Architecture
+
+This project follows a **Feature-First** directory structure with strict Separation of Concerns.
+
+### Directory Structure
 
 ```
-src/
-├── components/         # Shared UI components (Input, Button, Skeleton)
-│   └── layout/         # App Shell, Sidebar, Navbar
-├── features/           # Feature-based architecture
-│   ├── Auth/           # Login, Register, AuthContext
-│   ├── Chat/           # Messaging, Transaction Bubbles
-│   ├── Contacts/       # Contact List & Management
-│   ├── Dashboard/      # Stats, Trend Graphs, Activity Feed
-│   └── Settings/       # Profile management
-├── lib/                # Utilities (api.ts, utils.ts)
-├── App.tsx             # Main Router & Route Guards
-└── index.css           # Global Theme Variables & Tailwind Config
+frontend/src/
+├── app/                  # App-wide setup (store, providers)
+├── features/             # Feature Modules (The Core)
+│   ├── Auth/             # Login, Register, User State
+│   ├── Chat/             # Messaging & Transactions
+│   │   ├── components/   # ChatWindow, MessageBubble
+│   │   ├── hooks/        # useChatMessages (Data Logic)
+│   │   └── types.ts      # Feature-specific Types
+│   ├── Contacts/         # Contact Management
+│   └── Dashboard/        # Charts & Stats
+├── components/           # Global "Dumb" Components (Button, Input, Layouts)
+├── lib/                  # Utilities (API client, Formatters)
+└── pages/                # Route Components
 ```
 
-## ✨ Key Features
-*   **Feature-First Structure:** Code is collocated by business logic (Auth, Chat, etc.) rather than file type.
-*   **Dark Mode:** Semantic CSS variables controlled by a global ThemeContext.
-*   **Route Guards:** `RequireAuth` and `PublicOnly` components for security.
-*   **Responsive Design:** Mobile Drawer navigation and Desktop Pinnable Sidebar.
+### Key Design Patterns
+
+*   **Container/Presenter**: Complex logic (Data fetching, Error handling) is separated from UI rendering.
+    *   _Example:_ `ChatWindow.tsx` (Container) vs `ChatWindowContent.tsx` (Presenter).
+*   **Semantic Theming**: All colors use CSS variables (`bg-surface`, `text-primary`) defined in `index.css`. No hardcoded hex values.
+*   **Strict Typing**: All Props and API responses are typed via TypeScript interfaces.
+
+---
+
+## ✨ Key Frontend Features
+
+*   **Chat Interface**: Real-time polling, separating "Messages" from "Transactions".
+*   **Robust Routing**:
+    *   **Guards**: `RequireAuth` protects `/app/*`. `PublicOnly` protects `/login`.
+    *   **Error Handling**: Context-aware 404 pages (Generic, User Not Found) with recovery buttons.
+*   **Data Validation**:
+    *   **Strict URL Parsing**: `/contacts/123v` -> Immediate 404 (RegEx check).
+    *   **Input Masks**: Positive-only number inputs for money.

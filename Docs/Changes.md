@@ -1,5 +1,18 @@
 # Changelog
 
+## [2025-12-19 13:45] refactor(chat): separate container/presenter and harden validation
+**Summary:** Major architectural refactor of the `ChatWindow` component into a **Container/Presenter** pattern to separate data fetching logic from UI rendering. This improves code maintainability and testability. Additionally, hardened the Validation logic across the app by enforcing strict numeric IDs for Contacts (replaces partial parsing with immediate 404s) and ensuring consistent "Not Found" error states. Updated all documentation to reflect these changes.
+**Frontend Changes:**
+* `src/features/Chat/components/ChatWindow.tsx`: [Refactor] Converted to a **Container** component. Now solely responsible for `useChatMessages` hook integration, error handling (404/Generic), and loading states.
+* `src/features/Chat/components/ChatWindowContent.tsx`: [NEW] Created as a **Presenter** component. Contains all UI rendering, message list display, input handling, and transaction toggle logic. Receives pure data via props.
+* `src/features/Contacts/pages/ContactDetailPage.tsx`: [Feat] Added strict Regex validation (`/^\d+$/`) for the `id` param. URLs like `/contacts/123v` now immediately trigger a 404 instead of erroneously loading Contact 123.
+* `src/features/Chat/types.ts`: Removed duplicate imports to clean up dependencies.
+**Documentation:**
+* `Docs/SRS.md`: Updated "Frontend Standards" to mandate Container/Presenter pattern. Added "Strict URL Validation" and "Consistent 404s" requirements.
+* `README.md`: Updated Features list and Architecture section.
+* `frontend/README.md`: [NEW] Detailed frontend architecture documentation.
+* `backend/README.md`: [NEW] Detailed backend architecture documentation.
+
 ## [2025-12-19 09:00] feat(contacts): refactor layout to table and fix settings toggles
 **Summary:** Refactored the Contacts Page from a grid to a cleaner tabular layout with a serial number column and direct action buttons. Also fixed a bug in the Contact Settings Modal where toggle switches were unresponsive due to a syntax error.
 **Frontend Changes:**
