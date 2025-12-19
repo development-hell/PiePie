@@ -2,15 +2,39 @@ import { chatApi } from "@/features/Chat/api";
 import { MessageBubble } from "@/features/Chat/components/MessageBubble";
 import { useChatMessages } from "@/features/Chat/hooks/useChatMessages";
 import type { SendMessagePayload } from "@/features/Chat/types";
-import { ArrowDownLeft, ArrowUpRight, DollarSign, Loader2, MessageSquare, Send } from "lucide-react";
+import { ArrowDownLeft, ArrowLeft, ArrowUpRight, DollarSign, Loader2, MessageSquare, MoreVertical, Send, User as UserIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import type { User } from "@/features/Auth/types";
 
 interface ChatWindowProps {
     recipientUsername: string;
+    recipientUser?: User;
 }
 
-export function ChatWindow({ recipientUsername }: ChatWindowProps) {
+export function ChatWindow({ recipientUsername, recipientUser: initialRecipientUser }: ChatWindowProps) {
+    const navigate = useNavigate();
     const { messages, isLoading, isLoadingHistory, hasMore, loadMore, addMessage } = useChatMessages(recipientUsername);
+
+    // Derive display name & photo
+    const getUserDetails = () => {
+        let user: User | undefined = initialRecipientUser;
+
+        if (!user && messages.length > 0) {
+            const msg = messages.find(m => m.sender.username === recipientUsername || m.recipient.username === recipientUsername);
+            if (msg) {
+                user = msg.sender.username === recipientUsername ? msg.sender : msg.recipient;
+            }
+        }
+
+        return {
+            displayName: user ? (user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.username) : `@${recipientUsername}`,
+            profilePhoto: user?.profile_photo
+        };
+    };
+
+    const { displayName, profilePhoto } = getUserDetails();
 
     // Input State
     const [inputText, setInputText] = useState("");
@@ -113,8 +137,34 @@ export function ChatWindow({ recipientUsername }: ChatWindowProps) {
     return (
         <div className="flex flex-col h-full bg-surface-muted/30">
             {/* Header */}
-            <div className="p-4 bg-surface border-b border-border shadow-sm flex items-center gap-3">
-                <h2 className="font-semibold text-lg">@{recipientUsername}</h2>
+            <div className="p-3 bg-surface border-b border-border shadow-sm flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => navigate('/app/chats')}
+                        className="p-2 -ml-2 hover:bg-surface-muted rounded-full transition-colors"
+                        title="Back"
+                    >
+                        <ArrowLeft className="w-5 h-5 text-text-muted" />
+                    </button>
+
+                    {/* Avatar */}
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-border">
+                        {profilePhoto ? (
+                            <img src={profilePhoto} alt={displayName} className="w-full h-full object-cover" />
+                        ) : (
+                            <UserIcon className="w-5 h-5 text-primary" />
+                        )}
+                    </div>
+
+                    <h2 className="font-semibold text-lg">{displayName}</h2>
+                </div>
+
+                <button
+                    className="p-2 hover:bg-surface-muted rounded-full transition-colors text-text-muted hover:text-text"
+                    title="Menu"
+                >
+                    <MoreVertical className="w-5 h-5" />
+                </button>
             </div>
 
             {/* Messages Area */}

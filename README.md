@@ -60,6 +60,10 @@ npm run dev
 
 The app will accept API requests at `http://localhost:8000` and the frontend will run at `http://localhost:5173`.
 
+> For detailed setup and development guides, see:
+> *   [**Frontend Documentation**](./frontend/README.md)
+> *   [**Backend Documentation**](./backend/README.md)
+
 ---
 
 ## 📂 Project Architecture

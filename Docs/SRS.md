@@ -35,6 +35,9 @@ The application is divided into two distinct zones with specific layouts:
         *   **Top**: Navbar (Logo, Theme Toggle, Profile Dropdown).
         *   **Middle**: Flex Row containing Sidebar and Main Content.
         *   **Bottom**: Full-width Footer.
+    *   **Chat Window**:
+        *   **Header**: Contains Back Button (returns to list), User Avatar (with initials fallback), Display Name (First Last > Username), and Context Menu.
+        *   **Display Name Logic**: Prioritizes `First Name Last Name`. Falls back to `@username` if names are missing.
     *   **Sidebar**:
         *   **Desktop**:
             *   **Default**: Collapsed (`w-20`), displaying icons only.

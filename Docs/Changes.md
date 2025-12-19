@@ -1,5 +1,18 @@
 # Changelog
 
+## [2025-12-19 08:00] feat(chat): refine chat window header with display names and navigation controls
+**Summary:** Enhanced the Chat Window UI to be more app-like and user-friendly. The header now includes a functional Back button (essential for mobile/desktop navigation), the user's Profile Photo (with a fallback icon), and a Display Name that prioritizes "First Last" over "@username". Added a context menu placeholder.
+**Frontend Changes:**
+* `src/features/Chat/components/ChatWindow.tsx`:
+    *   [MOD] Added `ArrowLeft` button to close chat/navigate back.
+    *   [MOD] Implemented `getUserDetails` to resolve `displayName` (First+Last > Username) and `profilePhoto`.
+    *   [MOD] Added `UserIcon` fallback for missing avatars and a `MoreVertical` menu button.
+    *   [Fix] Ensured Back button is visible on Desktop (removed `md:hidden`) to allow closing the chat pane.
+* `src/features/Chat/pages/ChatsPage.tsx`: [MOD] Passed `recipientUser` prop to `ChatWindow` for immediate name rendering.
+**Documentation:**
+* `Docs/SRS.md`: Updated UI/UX specifications for Chat Window.
+* `frontend/README.md`: Added `lucide-react` to Tech Stack.
+
 ## [2025-12-19 00:41] feat(dashboard): implement financial dashboard with trends and activity feed
 **Summary:** Implemented a comprehensive Dashboard providing users with a high-level view of their finances. Features include KPI Stats (Totals), an interactive Trend Graph (powered by Recharts) with filters (Time Range, Transaction Type, Ownership), and a unified Activity Feed. Added global Skeleton loading states and fixed Theme toggle issues for dark mode.
 **Backend Changes:**

@@ -53,7 +53,10 @@ export function ChatsPage() {
                 !username ? "hidden md:flex" : "flex"
             )}>
                 {username ? (
-                    <ChatWindow recipientUsername={username} />
+                    <ChatWindow
+                        recipientUsername={username}
+                        recipientUser={recentChats.find(c => c.user.username === username)?.user}
+                    />
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-text-muted p-8 text-center">
                         <div className="w-16 h-16 rounded-full bg-surface-muted flex items-center justify-center mb-4">

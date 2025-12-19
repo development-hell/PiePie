@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# PiePie - Frontend Client ⚛️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the React frontend for PiePie. It provides a responsive, app-like experience for managing personal finances.
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-7.0-646CFF?logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css&logoColor=white)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack
+*   **Core:** React 19, TypeScript
+*   **Build Tool:** Vite 7
+*   **Styling:** Tailwind CSS v4 (with CSS Variables)
+*   **Routing:** React Router DOM 7
+*   **State Management:** React Context (Auth), Local State
+*   **Data Fetching:** Axios (with Interceptors)
+*   **Visualization:** Recharts
+*   **Icons:** Lucide React
 
-## React Compiler
+## 🚀 Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
+*   Node.js v20+
+*   npm
 
-## Expanding the ESLint configuration
+### Installation
+```bash
+# 1. Install dependencies
+npm install
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 2. Run the development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📂 Architecture
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── components/         # Shared UI components (Input, Button, Skeleton)
+│   └── layout/         # App Shell, Sidebar, Navbar
+├── features/           # Feature-based architecture
+│   ├── Auth/           # Login, Register, AuthContext
+│   ├── Chat/           # Messaging, Transaction Bubbles
+│   ├── Contacts/       # Contact List & Management
+│   ├── Dashboard/      # Stats, Trend Graphs, Activity Feed
+│   └── Settings/       # Profile management
+├── lib/                # Utilities (api.ts, utils.ts)
+├── App.tsx             # Main Router & Route Guards
+└── index.css           # Global Theme Variables & Tailwind Config
+```
+
+## ✨ Key Features
+*   **Feature-First Structure:** Code is collocated by business logic (Auth, Chat, etc.) rather than file type.
+*   **Dark Mode:** Semantic CSS variables controlled by a global ThemeContext.
+*   **Route Guards:** `RequireAuth` and `PublicOnly` components for security.
+*   **Responsive Design:** Mobile Drawer navigation and Desktop Pinnable Sidebar.
