@@ -98,6 +98,7 @@ PiePie/
     *   Smart Redirection (`?next=`) logic.
 *   **👥 Contacts Management:**
     *   Add users by unique username.
+    *   **Detailed Profile:** Rich stats, shared history, and interaction graph.
     *   Shared transaction history.
 *   **💸 Transaction Ledger:**
     *   Record expenses/payments with contacts.

@@ -1,5 +1,13 @@
 # Changelog
 
+## [2025-12-20 19:44] feat(contacts): design detailed contact profile page
+**Summary:** Transformed the placeholder `ContactDetailPage.tsx` into a rich profile view. Features include a visual header with avatar/navigation, a "Quick Actions" bar, a relationship stats grid (Shared History, Last Interaction), and a chronologically ordered "Recent Activity" feed derived from chat messages. Also updated all documentation (SRS, READMEs) to reflect these new capabilities.
+**Frontend Changes:**
+* `src/features/Contacts/pages/ContactDetailPage.tsx`: [Feat] Implemented full UI. Integrated `useChatMessages` to fetch and derive activity stats. Added responsive header and financial history list.
+**Documentation:**
+* `Docs/SRS.md`: Updated "UI/UX Specifications" with detailed Contact Page requirements.
+* `README.md` & `frontend/README.md`: Added "Detailed Contact Profile" to features list.
+
 ## [2025-12-19 13:45] refactor(chat): separate container/presenter and harden validation
 **Summary:** Major architectural refactor of the `ChatWindow` component into a **Container/Presenter** pattern to separate data fetching logic from UI rendering. This improves code maintainability and testability. Additionally, hardened the Validation logic across the app by enforcing strict numeric IDs for Contacts (replaces partial parsing with immediate 404s) and ensuring consistent "Not Found" error states. Updated all documentation to reflect these changes.
 **Frontend Changes:**

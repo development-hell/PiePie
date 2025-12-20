@@ -43,6 +43,10 @@ The application is divided into two distinct zones with specific layouts:
         *   **Columns**: # (Serial Number), Name (w/ Avatar), Username, Actions.
         *   **Actions**: Message (Jump to chat), Settings, Delete.
         *   **Interaction**: Row click navigates to Contact Detail view.
+    *   **Contact Detail Page**:
+        *   **Header**: Large Profile Photo, Name, Username, and Quick Actions (Message, Block, Delete).
+        *   **Stats Grid**: 'Shared History' (Transaction Count), 'Last Interaction' (Date), and Relationship Status.
+        *   **Recent Activity**: Chronological list of recent financial transactions (In/Out) derived from chat history.
     *   **Sidebar**:
         *   **Desktop**:
             *   **Default**: Collapsed (`w-20`), displaying icons only.

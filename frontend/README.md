@@ -66,3 +66,5 @@ frontend/src/
 *   **Data Validation**:
     *   **Strict URL Parsing**: `/contacts/123v` -> Immediate 404 (RegEx check).
     *   **Input Masks**: Positive-only number inputs for money.
+*   **Contact Experience**:
+    *   **Detailed Profile**: Header, Stats grid, and Recent Activity feed.
