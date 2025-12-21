@@ -13,9 +13,16 @@ class TransactionSerializer(serializers.ModelSerializer):
     payer_id = serializers.PrimaryKeyRelatedField(source="payer", queryset=User.objects.all(), write_only=True)
     recipient_id = serializers.PrimaryKeyRelatedField(source="recipient", queryset=User.objects.all(), write_only=True)
 
+    message_id = serializers.SerializerMethodField()
+
     class Meta:
         model = Transaction
-        fields = ["id", "payer", "payer_id", "recipient", "recipient_id", "created_by", "amount", "description", "status", "created_at"]
+        fields = ["id", "payer", "payer_id", "recipient", "recipient_id", "created_by", "amount", "description", "status", "created_at", "message_id"]
+
+    def get_message_id(self, obj):
+        if hasattr(obj, "message"):
+            return obj.message.id
+        return None
 
 
 class MessageSerializer(serializers.ModelSerializer):

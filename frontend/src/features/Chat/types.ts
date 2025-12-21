@@ -9,6 +9,7 @@ export interface Transaction {
     description: string;
     status: "PENDING" | "CONFIRMED" | "REJECTED";
     created_at: string;
+    message_id?: number;
 }
 
 export interface Message {

@@ -38,7 +38,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
     if (!isTransaction || !message.transaction) {
         return (
-            <div className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}>
+            <div id={`msg-${message.id}`} className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}>
                 <div className={cn(
                     "max-w-[80%] rounded-2xl px-4 py-2 shadow-sm",
                     isMe ? "bg-primary text-text-on-primary rounded-tr-none" : "bg-surface text-text rounded-tl-none border border-border"
@@ -83,7 +83,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     }[status || 'PENDING'];
 
     return (
-        <div className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}>
+        <div id={`msg-${message.id}`} className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}>
             <div className={cn(
                 "max-w-[85%] sm:max-w-[300px] rounded-2xl shadow-sm overflow-hidden border",
                 isMe ? "bg-surface rounded-tr-none border-primary/20" : "bg-surface rounded-tl-none border-border"

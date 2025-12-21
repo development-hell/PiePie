@@ -1,5 +1,21 @@
 # Changelog
 
+## [2025-12-22 01:05] docs(srs): update requirements with transactions and chat features
+**Summary:** Updated the SRS to reflect recent feature implementations. Added details for the new Transactions Page, Transaction Details Modal, Deep Linking in Chat, and Dashboard Graph improvements.
+**Files Changed:**
+* `Docs/SRS.md`: Added specs for Transactions, Modals, Deep Linking, and updated Data Models.
+
+
+## [2025-12-21 23:59] feat(chat): implement deep linking to transactions in chat
+**Summary:** Implemented "Show in Chat" functionality that navigates to the specific message in the chat history. The Transaction Details Modal now links directly to the `message_id` associated with the transaction, and the Chat Window automatically scrolls to highlight that message.
+**Frontend Changes:**
+* `TransactionDetailsModal`: Updated navigation URL to include `?highlight=messageId`.
+* `ChatWindowContent`: Implemented logic to read `highlight` query param and scroll the target message into view.
+* `MessageBubble`: Added DOM `id` attributes to message elements for targeting.
+* `types`: Updated `Transaction` interface to include optional `message_id`.
+**Backend Changes:**
+* `TransactionSerializer`: Exposed `message_id` field using a `SerializerMethodField` to resolve the reverse relationship safely.
+
 ## [2025-12-21 21:58] feat(transactions): add transaction details modal
 **Summary:** Enhanced transaction management with a detailed modal view allowing immediate actions (Confirm/Reject).
 **Frontend Changes:**

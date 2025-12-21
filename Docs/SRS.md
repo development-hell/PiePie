@@ -47,6 +47,11 @@ The application is divided into two distinct zones with specific layouts:
         *   **Layout**: Comprehensive filtering list view.
         *   **Filters**: Filter by Status (Pending, Confirmed, Rejected) and Direction (Sent, Received).
         *   **Visuals**: Clear status badges and color-coded amounts.
+        *   **Interaction**: Rows are clickable, opening the **Transaction Details Modal**.
+    *   **Transaction Details Modal**:
+        *   **Purpose**: Focused view for transaction details.
+        *   **Actions**: 'Confirm' or 'Reject' pending transactions (if not creator).
+        *   **Deep Linking**: 'Show in Chat' button navigates to the specific message in the chat history with visual highlighting.
     *   **Contact Detail Page**:
         *   **Header**: Large Profile Photo, Name, Username, and Quick Actions (Message, Block, Delete).
         *   **Stats Grid**: 'Shared History' (Transaction Count), 'Last Interaction' (Date), and Relationship Status.
@@ -93,7 +98,8 @@ The application is divided into two distinct zones with specific layouts:
         *   **Send vs Request**: Distinct flows for paying vs requesting money.
         *   **Confirmation Loop**: Transactions start as `PENDING`. Counterparty must `CONFIRM` or `REJECT`.
         *   **Security**: Initiator cannot approve their own requests.
-    *   Create, read, update, delete transactions.
+        *   **Deep Linking**: Transactions in the feed or lists link back to their original context in the chat, scrolling to and highlighting the source message.
+    *   Manage (Create, Read, Update) transactions with strict status guards.
 *   **Entity Management**: Manage Contacts, Groups, and Accounts.
     *   **Strict URL Validation**: ID parameters in URLs (e.g., `/contacts/:id`) must be strictly numeric. Non-numeric IDs (e.g., `123v`) must trigger an immediate 404 error.
 *   **Privacy & Security**:
@@ -106,6 +112,7 @@ The application is divided into two distinct zones with specific layouts:
     *   **Financial Overview**: High-level stats (Total Sent, Total Received, Pending Actions).
     *   **Trend Analysis**: Interactive graph (Line/Bar/Pie) illustrating spending history over time (7d, 30d, 90d, 1y).
         *   **Visuals**: Multi-line graph showing **Total**, **Sent**, and **Received** flows.
+        *   **Logic**: Data is zero-filled to ensure a continuous timeline even for days without transactions.
         *   **Filters**: View 'All', 'Sent', 'Received', 'My Requests' (Owned), or 'Others Requests' (Not Owned).
     *   **Activity Feed**: Unified chronological stream of recent transactions.
 *   **Performance**:
@@ -128,6 +135,7 @@ The application is divided into two distinct zones with specific layouts:
         *   `payer`, `recipient`, `amount`, `description`.
         *   `status`: PENDING, CONFIRMED, REJECTED.
         *   `created_by`: User who initiated the transaction (for Pay vs Request logic).
+        *   `message_id`: Link to the chat message context.
 *   **Outputs**: Net balances, transaction history feeds.
 
 ## 4. Technical Constraints (Minor Details)

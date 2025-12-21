@@ -4,7 +4,7 @@ import { MessageBubble } from "@/features/Chat/components/MessageBubble";
 import type { Message, SendMessagePayload } from "@/features/Chat/types";
 import { ArrowDownLeft, ArrowLeft, ArrowUpRight, DollarSign, Loader2, MessageSquare, MoreVertical, Send, User as UserIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export interface ChatWindowContentProps {
     recipientUsername: string;
@@ -79,15 +79,37 @@ export function ChatWindowContent({
         }
     }, [messages, isLoadingHistory]);
 
+    const [searchParams] = useSearchParams();
+    const highlightId = searchParams.get('highlight');
     const [initialScrolled, setInitialScrolled] = useState(false);
+
+    // Initial Scroll Logic (Bottom OR Highlight)
     useEffect(() => {
         if (!isLoading && messages.length > 0 && scrollRef.current) {
             if (!initialScrolled) {
-                scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-                setInitialScrolled(true);
+                if (highlightId) {
+                    const el = document.getElementById(`msg-${highlightId}`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Highlight effect: Add background color and transition
+                        el.classList.add('bg-primary/20', 'transition-colors', 'duration-1000', 'rounded-lg');
+                        setTimeout(() => {
+                            el.classList.remove('bg-primary/20');
+                            // Clean up utility classes after fading out
+                            setTimeout(() => el.classList.remove('transition-colors', 'duration-1000', 'rounded-lg'), 1000);
+                        }, 2500);
+                        setInitialScrolled(true);
+                    }
+                    // If msg not found yet (pagination), we might need to handle that, but for now we skip bottom scroll if we are *trying* to highlight.
+                    // Or, if not found, do we default to bottom? Maybe. Let's wait.
+                } else {
+                    // Default behavior: Scroll to bottom
+                    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                    setInitialScrolled(true);
+                }
             }
         }
-    }, [isLoading, recipientUsername, messages.length, initialScrolled]);
+    }, [isLoading, messages, highlightId, initialScrolled]);
 
     useEffect(() => {
         setInitialScrolled(false);
@@ -177,7 +199,7 @@ export function ChatWindowContent({
 
             {/* Messages Area */}
             <div
-                className="flex-1 overflow-y-auto p-4 space-y-4"
+                className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar"
                 ref={scrollRef}
                 onScroll={handleScroll}
             >

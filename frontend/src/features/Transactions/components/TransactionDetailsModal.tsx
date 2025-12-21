@@ -4,6 +4,7 @@ import { chatApi } from "@/features/Chat/api";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/Auth/context/AuthContext";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface TransactionDetailsModalProps {
     transaction: Transaction;
@@ -14,6 +15,7 @@ interface TransactionDetailsModalProps {
 
 export function TransactionDetailsModal({ transaction, isOpen, onClose, onUpdate }: TransactionDetailsModalProps) {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -120,29 +122,44 @@ export function TransactionDetailsModal({ transaction, isOpen, onClose, onUpdate
                 </div>
 
                 {/* Footer Actions */}
-                {canAct && (
-                    <div className="p-4 border-t border-border bg-surface-muted/30 flex gap-3">
-                        <button
-                            onClick={() => handleAction('reject')}
-                            disabled={isProcessing}
-                            className="flex-1 py-2.5 bg-white border border-border text-red-600 rounded-xl hover:bg-red-50 font-medium transition-colors disabled:opacity-50"
-                        >
-                            Reject
-                        </button>
-                        <button
-                            onClick={() => handleAction('confirm')}
-                            disabled={isProcessing}
-                            className="flex-1 py-2.5 bg-black text-white rounded-xl hover:bg-gray-800 font-medium transition-colors shadow-lg shadow-gray-900/20 disabled:opacity-50"
-                        >
-                            Confirm
-                        </button>
-                    </div>
-                )}
-                {!canAct && transaction.status === 'PENDING' && (
-                    <div className="p-4 border-t border-border bg-surface-muted/30 text-center text-sm text-text-muted">
-                        Waiting for {isCreator ? 'counterparty' : 'other party'} to confirm.
-                    </div>
-                )}
+                <div className="p-4 border-t border-border bg-surface-muted/30 flex flex-col gap-3">
+                    {canAct && (
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => handleAction('reject')}
+                                disabled={isProcessing}
+                                className="flex-1 py-2.5 bg-white border border-border text-red-600 rounded-xl hover:bg-red-50 font-medium transition-colors disabled:opacity-50"
+                            >
+                                Reject
+                            </button>
+                            <button
+                                onClick={() => handleAction('confirm')}
+                                disabled={isProcessing}
+                                className="flex-1 py-2.5 bg-black text-white rounded-xl hover:bg-gray-800 font-medium transition-colors shadow-lg shadow-gray-900/20 disabled:opacity-50"
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={() => {
+                            onClose();
+                            const username = isPayer ? transaction.recipient.username : transaction.payer.username;
+                            const query = transaction.message_id ? `?highlight=${transaction.message_id}` : '';
+                            navigate(`/app/chats/${username}${query}`);
+                        }}
+                        className="w-full py-2.5 bg-surface border border-border text-text rounded-xl hover:bg-surface-muted font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                        Show in Chat
+                    </button>
+
+                    {!canAct && transaction.status === 'PENDING' && (
+                        <div className="text-center text-xs text-text-muted mt-1">
+                            Waiting for {isCreator ? 'counterparty' : 'other party'} to confirm.
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
