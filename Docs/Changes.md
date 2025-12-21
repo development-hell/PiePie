@@ -1,5 +1,10 @@
 # Changelog
 
+## [2025-12-22 01:29] feat(ui): implement click-outside-to-close for transaction modal
+**Summary:** The `TransactionDetailsModal` now listens for clicks on the backdrop overlay to close the modal, adhering to standard UI patterns and improving user convenience.
+**Frontend Changes:**
+* `TransactionDetailsModal`: Added `onClick={onClose}` to the backdrop and stopped propagation on the modal content to prevent accidental closing.
+
 ## [2025-12-22 01:27] feat(chat): open transaction details from chat bubble
 **Summary:** Users can now click on a transaction message within the chat to open the `TransactionDetailsModal`. This provides consistent details and actions (Confirm/Reject) directly from the chat feed without navigating away.
 **Frontend Changes:**

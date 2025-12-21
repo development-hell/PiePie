@@ -51,8 +51,14 @@ export function TransactionDetailsModal({ transaction, isOpen, onClose, onUpdate
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div
+            onClick={onClose}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
+            >
                 {/* Header */}
                 <div className="p-4 border-b border-border flex items-center justify-between bg-surface-muted/30">
                     <h2 className="text-lg font-bold">Transaction Details</h2>
