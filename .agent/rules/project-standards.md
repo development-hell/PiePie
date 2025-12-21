@@ -23,3 +23,7 @@ trigger: always_on
 * **Documentation:**
     * **Docstrings:** Every module, class, and public function must have a docstring.
     * **Inline Comments:** Add comments to explain *complex logic* or *business rules*. Do not comment on obvious syntax (e.g., avoid `# increment i` above `i += 1`).
+
+## 4. Terminal & Command Execution
+*   **Sequential Execution**: NEVER use `&&` or `;` to chain commands in a single `run_command` call. Always execute commands sequentially in separate tool calls.
+*   **Platform Compatibility**: All commands must be strictly compatible with **Windows PowerShell**. Avoid Unix-specific syntax like `sudo`, `touch`, `rm -rf`, or chaining operators.

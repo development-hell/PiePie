@@ -3,6 +3,8 @@ import { transactionsApi, type TransactionListResponse } from "@/features/Transa
 import { Loader2, ArrowUpRight, ArrowDownLeft, Clock, CheckCircle, XCircle, Filter } from "lucide-react";
 import { useAuth } from "@/features/Auth/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { type Transaction } from "@/features/Chat/types";
+import { TransactionDetailsModal } from "../components/TransactionDetailsModal";
 
 export function TransactionsPage() {
     const { user } = useAuth();
@@ -10,24 +12,42 @@ export function TransactionsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [typeFilter, setTypeFilter] = useState<string>("");
+    const [selectedTxn, setSelectedTxn] = useState<Transaction | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const fetchTxns = async () => {
+        setIsLoading(true);
+        try {
+            const res = await transactionsApi.getTransactions({
+                status: (statusFilter as 'pending' | 'confirmed' | 'rejected') || undefined,
+                type: (typeFilter as 'sent' | 'received') || undefined
+            });
+            setData(res);
+        } catch (error) {
+            console.error("Failed to fetch transactions", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchTxns = async () => {
-            setIsLoading(true);
-            try {
-                const res = await transactionsApi.getTransactions({
-                    status: (statusFilter as 'pending' | 'confirmed' | 'rejected') || undefined,
-                    type: (typeFilter as 'sent' | 'received') || undefined
-                });
-                setData(res);
-            } catch (error) {
-                console.error("Failed to fetch transactions", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         fetchTxns();
     }, [statusFilter, typeFilter]);
+
+    const handleTransactionClick = (txn: Transaction) => {
+        setSelectedTxn(txn);
+        setIsModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setSelectedTxn(null);
+    };
+
+    const handleTransactionUpdate = () => {
+        // Refresh list to show new status
+        fetchTxns();
+    };
 
     if (!user) return null;
 
@@ -102,7 +122,11 @@ export function TransactionsPage() {
                             }
 
                             return (
-                                <div key={txn.id} className="flex items-center justify-between p-4 hover:bg-surface-muted/50 transition-colors">
+                                <div
+                                    key={txn.id}
+                                    onClick={() => handleTransactionClick(txn)}
+                                    className="flex items-center justify-between p-4 hover:bg-surface-muted/50 transition-colors cursor-active cursor-pointer"
+                                >
                                     <div className="flex items-center gap-4">
                                         <div className={cn("p-2 rounded-full", isIncoming ? "bg-green-100 text-green-600 dark:bg-green-900/20" : "bg-surface-muted text-text-muted border border-border")}>
                                             {isIncoming ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
@@ -134,6 +158,16 @@ export function TransactionsPage() {
                     </div>
                 )}
             </div>
+
+            {/* Detail Modal */}
+            {selectedTxn && (
+                <TransactionDetailsModal
+                    transaction={selectedTxn}
+                    isOpen={isModalOpen}
+                    onClose={handleModalClose}
+                    onUpdate={handleTransactionUpdate}
+                />
+            )}
         </div>
     );
 }

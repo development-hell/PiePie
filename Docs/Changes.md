@@ -1,5 +1,12 @@
 # Changelog
 
+## [2025-12-21 21:58] feat(transactions): add transaction details modal
+**Summary:** Enhanced transaction management with a detailed modal view allowing immediate actions (Confirm/Reject).
+**Frontend Changes:**
+* `src/features/Transactions/components/TransactionDetailsModal.tsx`: [NEW] Modal component for viewing details and performing actions.
+* `src/features/Transactions/pages/TransactionsPage.tsx`: Integrated the modal with the transaction list.
+
+
 ## [2025-12-21 20:20] feat(transactions): implement transactions page and refine pending logic
 **Summary:** Implemented a full "Transactions Page" with filtering capabilities (Status, Type) and visual indicators. Updated the dashboard "Pending Actions" logic to count ALL pending transactions involving the user (including self-initiated requests), giving a complete view of pending business. Also refined API types for strictness.
 **Frontend Changes:**
