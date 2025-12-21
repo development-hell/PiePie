@@ -295,16 +295,27 @@ class DashboardViewSet(viewsets.ViewSet):
             .order_by("date")
         )
 
-        # Handle None values (if no txns for a day match the filter)
-        result = []
+        # 5. Fill Empty Dates
+        # Create a dict of {date: {sent: 0, received: 0}} for the full range
+        date_map = {}
+        current_date = data[0]["date"]
+        end_date = now.date()
+
+        while current_date <= end_date:
+            date_map[current_date] = {"sent": 0, "received": 0}
+            current_date += datetime.timedelta(days=1)
+
+        # Update with actual data
         for entry in data:
-            result.append(
-                {
-                    "date": entry["date"],
-                    "sent": entry["sent"] or 0,
-                    "received": entry["received"] or 0,
-                }
-            )
+            d = entry["date"]
+            print(entry)
+            if d in date_map:
+                date_map[d]["sent"] = entry["sent"] or 0
+                date_map[d]["received"] = entry["received"] or 0
+
+        # Convert back to list
+        result = [{"date": d, "sent": stats["sent"], "received": stats["received"]} for d, stats in sorted(date_map.items())]
+
         return Response(result)
 
 
