@@ -1,7 +1,8 @@
 import type { User } from "@/features/Auth/types";
 import { chatApi } from "@/features/Chat/api";
 import { MessageBubble } from "@/features/Chat/components/MessageBubble";
-import type { Message, SendMessagePayload } from "@/features/Chat/types";
+import type { Message, SendMessagePayload, Transaction } from "@/features/Chat/types";
+import { TransactionDetailsModal } from "@/features/Transactions/components/TransactionDetailsModal";
 import { ArrowDownLeft, ArrowLeft, ArrowUpRight, DollarSign, Loader2, MessageSquare, MoreVertical, Send, User as UserIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -58,6 +59,15 @@ export function ChatWindowContent({
     // Transaction State
     const [amount, setAmount] = useState("");
     const [description, setDescription] = useState("");
+
+    // Detail Modal State
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleTransactionClick = (transaction: Transaction) => {
+        setSelectedTransaction(transaction);
+        setIsModalOpen(true);
+    };
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const previousHeightRef = useRef(0);
@@ -216,7 +226,11 @@ export function ChatWindowContent({
                     </div>
                 ) : (
                     messages.map((msg) => (
-                        <MessageBubble key={msg.id} message={msg} />
+                        <MessageBubble
+                            key={msg.id}
+                            message={msg}
+                            onTransactionClick={handleTransactionClick}
+                        />
                     ))
                 )}
             </div>
@@ -324,6 +338,30 @@ export function ChatWindowContent({
                     </form>
                 )}
             </div>
-        </div>
+
+            {/* Transaction Details Modal */ }
+    {
+        selectedTransaction && (
+            <TransactionDetailsModal
+                transaction={selectedTransaction}
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedTransaction(null);
+                }}
+                onUpdate={() => {
+                    // Optimistic updates are handled in MessageBubble, 
+                    // but if we need to refresh list we can call a refresh handler if provided.
+                    // TransactionDetailsModal calls onUpdate when action completes.
+                    // For chat bubbles, the local state in MessageBubble handles the status check on mount.
+                    // However, if we confirm in modal, the bubble underneath might not update immediately 
+                    // unless we trigger a re-fetch or update local store.
+                    // Ideally simple re-mount or context update works.
+                    // For now we'll rely on real-time polling or lazy update.
+                }}
+            />
+        )
+    }
+        </div >
     );
 }

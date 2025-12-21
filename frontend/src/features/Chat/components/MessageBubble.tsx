@@ -1,15 +1,16 @@
 import { useAuth } from "@/features/Auth/context/AuthContext";
 import { chatApi } from "@/features/Chat/api";
-import type { Message } from "@/features/Chat/types";
+import type { Message, Transaction } from "@/features/Chat/types";
 import { cn } from "@/lib/utils";
 import { ArrowDownLeft, ArrowUpRight, CheckCircle2, Clock, Loader2, XCircle } from "lucide-react";
 import { useState } from "react";
 
 interface MessageBubbleProps {
     message: Message;
+    onTransactionClick?: (transaction: Transaction) => void;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message, onTransactionClick }: MessageBubbleProps) {
     const { user } = useAuth();
     const isMe = message.sender.username === user?.username;
     const isTransaction = !!message.transaction;
@@ -84,10 +85,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
     return (
         <div id={`msg-${message.id}`} className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}>
-            <div className={cn(
-                "max-w-[85%] sm:max-w-[300px] rounded-2xl shadow-sm overflow-hidden border",
-                isMe ? "bg-surface rounded-tr-none border-primary/20" : "bg-surface rounded-tl-none border-border"
-            )}>
+            <div
+                onClick={() => isTransaction && message.transaction && onTransactionClick?.(message.transaction)}
+                className={cn(
+                    "max-w-[85%] sm:max-w-[300px] rounded-2xl shadow-sm overflow-hidden border transition-transform active:scale-95",
+                    isMe ? "bg-surface rounded-tr-none border-primary/20" : "bg-surface rounded-tl-none border-border",
+                    onTransactionClick ? "cursor-pointer hover:bg-surface-muted/50" : ""
+                )}>
                 {/* Header Section */}
                 <div className="p-4 bg-surface-muted/50 border-b border-border flex items-center gap-3">
                     <div className={cn("p-2 rounded-full", isMe ? "bg-primary/10 text-primary" : "bg-surface-muted text-text-muted")}>
@@ -118,7 +122,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                     {canAction && (
                         <div className="flex gap-2 mt-2 pt-2 border-t border-border">
                             <button
-                                onClick={() => handleAction('confirm')}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAction('confirm');
+                                }}
                                 disabled={isProcessing}
                                 className="flex-1 py-1.5 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition flex justify-center items-center gap-1"
                             >
@@ -126,7 +133,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                                 Confirm
                             </button>
                             <button
-                                onClick={() => handleAction('reject')}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAction('reject');
+                                }}
                                 disabled={isProcessing}
                                 className="flex-1 py-1.5 bg-surface border border-red-200 text-red-600 text-xs rounded hover:bg-red-50 transition flex justify-center items-center gap-1"
                             >

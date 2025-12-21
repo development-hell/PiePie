@@ -1,5 +1,12 @@
 # Changelog
 
+## [2025-12-22 01:27] feat(chat): open transaction details from chat bubble
+**Summary:** Users can now click on a transaction message within the chat to open the `TransactionDetailsModal`. This provides consistent details and actions (Confirm/Reject) directly from the chat feed without navigating away.
+**Frontend Changes:**
+* `ChatWindowContent`: Added `TransactionDetailsModal` and state management. Modified `MessageBubble` rendering to handle clicks.
+* `MessageBubble`: Added `onTransactionClick` prop and interactive styling for transaction bubbles.
+
+
 ## [2025-12-22 01:05] docs(srs): update requirements with transactions and chat features
 **Summary:** Updated the SRS to reflect recent feature implementations. Added details for the new Transactions Page, Transaction Details Modal, Deep Linking in Chat, and Dashboard Graph improvements.
 **Files Changed:**
