@@ -298,10 +298,40 @@ class DashboardViewSet(viewsets.ViewSet):
         # Handle None values (if no txns for a day match the filter)
         result = []
         for entry in data:
-            result.append({
-                "date": entry["date"],
-                "sent": entry["sent"] or 0,
-                "received": entry["received"] or 0,
-            })
-
+            result.append(
+                {
+                    "date": entry["date"],
+                    "sent": entry["sent"] or 0,
+                    "received": entry["received"] or 0,
+                }
+            )
         return Response(result)
+
+
+class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    List all transactions involving the user.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+    from .serializers import TransactionSerializer
+
+    serializer_class = TransactionSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Transaction.objects.filter(Q(payer=user) | Q(recipient=user)).select_related("payer", "recipient", "created_by")
+
+        # Filters
+        status_filter = self.request.query_params.get("status")
+        if status_filter:
+            queryset = queryset.filter(status=status_filter.upper())
+
+        type_filter = self.request.query_params.get("type")
+        if type_filter == "sent":
+            queryset = queryset.filter(payer=user)
+        elif type_filter == "received":
+            queryset = queryset.filter(recipient=user)
+
+        return queryset.order_by("-created_at")

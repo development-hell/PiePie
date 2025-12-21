@@ -43,6 +43,10 @@ The application is divided into two distinct zones with specific layouts:
         *   **Columns**: # (Serial Number), Name (w/ Avatar), Username, Actions.
         *   **Actions**: Message (Jump to chat), Settings, Delete.
         *   **Interaction**: Row click navigates to Contact Detail view.
+    *   **Transactions Page**:
+        *   **Layout**: Comprehensive filtering list view.
+        *   **Filters**: Filter by Status (Pending, Confirmed, Rejected) and Direction (Sent, Received).
+        *   **Visuals**: Clear status badges and color-coded amounts.
     *   **Contact Detail Page**:
         *   **Header**: Large Profile Photo, Name, Username, and Quick Actions (Message, Block, Delete).
         *   **Stats Grid**: 'Shared History' (Transaction Count), 'Last Interaction' (Date), and Relationship Status.
@@ -150,7 +154,7 @@ PiePie/
 │   ├── package.json
 │   ├── src/
 │   │   ├── components/  # Global UI components & Layouts
-│   │   ├── features/    # Feature-based folders (Auth, Chat, Contacts, Settings)
+│   │   ├── features/    # Feature-based folders (Auth, Chat, Contacts, Dashboard, Settings, Transactions)
 │   │   │   └── Chat/
 │   │   │       ├── components/
 │   │   │       ├── hooks/       # Custom hooks (useChatMessages)

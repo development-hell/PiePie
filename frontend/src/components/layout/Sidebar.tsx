@@ -1,4 +1,4 @@
-import { MessageSquare, Users, Settings, LogOut, X, LayoutDashboard, type LucideIcon } from "lucide-react";
+import { MessageSquare, Users, Settings, LogOut, X, LayoutDashboard, ArrowUpRight, type LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/features/Auth/context/AuthContext";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { name: "Dashboard", href: "/app/dashboard", icon: LayoutDashboard },
+  { name: "Transactions", href: "/app/transactions", icon: ArrowUpRight }, // Using ArrowUpRight as generic icon
   { name: "Chats", href: "/app/chats", icon: MessageSquare },
   { name: "Contacts", href: "/app/contacts", icon: Users },
   { name: "Settings", href: "/app/settings", icon: Settings },

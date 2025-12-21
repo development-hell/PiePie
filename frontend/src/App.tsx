@@ -4,6 +4,7 @@ import { PublicOnly, RequireAuth } from "@/components/RouteGuards";
 import { LoginPage } from "@/features/Auth/pages/LoginPage";
 import { RegisterPage } from "@/features/Auth/pages/RegisterPage";
 import { ChatsPage } from "@/features/Chat/pages/ChatsPage";
+import { TransactionsPage } from '@/features/Transactions/pages/TransactionsPage';
 import { ContactDetailPage } from "@/features/Contacts/pages/ContactDetailPage";
 import { ContactsPage } from "@/features/Contacts/pages/ContactsPage";
 import { DashboardPage } from "@/features/Dashboard/pages/DashboardPage";
@@ -35,6 +36,7 @@ function App() {
           <Route path="contacts" element={<ContactsPage />} />
           <Route path="contacts/:id" element={<ContactDetailPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>

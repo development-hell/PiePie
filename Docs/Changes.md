@@ -1,5 +1,21 @@
 # Changelog
 
+## [2025-12-21 20:20] feat(transactions): implement transactions page and refine pending logic
+**Summary:** Implemented a full "Transactions Page" with filtering capabilities (Status, Type) and visual indicators. Updated the dashboard "Pending Actions" logic to count ALL pending transactions involving the user (including self-initiated requests), giving a complete view of pending business. Also refined API types for strictness.
+**Frontend Changes:**
+* `src/features/Transactions/`: [NEW] Added `TransactionsPage` and `api` service.
+* `src/components/layout/Sidebar.tsx`: Added Transactions link.
+* `src/App.tsx`: Registered `/app/transactions` route.
+* `src/features/Transactions/api.ts`: Enforced strict union types for status (`pending` | `confirmed` | `rejected`).
+**Backend Changes:**
+* `backend/ledger/views.py`: 
+    *   [Feat] Added `TransactionViewSet` for filtered transaction listing.
+    *   [Refactor] Updated `dashboard/stats` ("Pending Actions") to include transactions created by the user (sent requests).
+* `backend/ledger/urls.py`: Registered `/transactions` endpoint.
+**Documentation:**
+* `Docs/SRS.md`: Documented Transactions Page, Pending Action definition, and updated File Structure.
+
+
 ## [2025-12-21 19:25] feat(dashboard): implement triple-line trend graph and update SRS
 **Summary:** Enhanced the Dashboard Trend Graph to display three distinct lines: Total (Blue), Sent (Red), and Received (Green), enabling users to see net volume alongside incoming/outgoing flows. The areas are unstacked for clearer comparison. Also updated the SRS to include TanStack Query in the tech stack (preparing for caching implementation) and refined the graph specifications.
 **Frontend Changes:**
