@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { type GraphParams, type GraphPoint, dashboardApi } from "@/features/Dashboard/api";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface TrendGraphProps {
-    // We fetch data internally based on controls
-}
 
 export function TrendGraph() {
     const [data, setData] = useState<GraphPoint[]>([]);
@@ -47,9 +43,14 @@ export function TrendGraph() {
         const CommonTooltip = ({ active, payload, label }: any) => {
             if (active && payload && payload.length) {
                 return (
-                    <div className="bg-surface border border-border p-3 rounded-lg shadow-lg">
-                        <p className="text-sm font-medium mb-1">{label}</p>
-                        <p className="text-primary font-bold">${payload[0].value.toLocaleString()}</p>
+                    <div className="bg-surface border border-border p-3 rounded-lg shadow-lg min-w-[150px]">
+                        <p className="text-sm font-medium mb-2 text-text-muted">{label}</p>
+                        {payload.map((entry: any, index: number) => (
+                            <div key={index} className="flex justify-between items-center gap-4 mb-1">
+                                <span className="text-xs font-semibold capitalize" style={{ color: entry.stroke }}>{entry.name}:</span>
+                                <span className="font-bold text-text">${entry.value.toLocaleString()}</span>
+                            </div>
+                        ))}
                     </div>
                 );
             }
@@ -57,31 +58,31 @@ export function TrendGraph() {
         };
 
         if (type === 'pie') {
-            // Aggregated Pie (Sent vs Received needs distinct data actually, but current API returns time series. 
-            // For Pie, we might just sum it up? Or user wants breakdown.
-            // Requirement: "data of graph (all trnasaction, sent, recevied)"
-            // Pie chart of Time Series is weird unless it's "Spending by Day".
-            // Let's stick to simple "Spending by Day" slices for now or switch back to line if data is 1 point.
+            const totalSent = data.reduce((acc, curr) => acc + curr.sent, 0);
+            const totalReceived = data.reduce((acc, curr) => acc + curr.received, 0);
+            const pieData = [
+                { name: 'Received', value: totalReceived, color: '#16A34A' },
+                { name: 'Sent', value: totalSent, color: '#EF4444' }
+            ];
+
             return (
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
-                            data={data as any}
-                            dataKey="amount"
-                            nameKey="date"
+                            data={pieData}
+                            dataKey="value"
+                            nameKey="name"
                             cx="50%"
                             cy="50%"
                             innerRadius={60}
                             outerRadius={80}
-                            fill="#8884d8"
                             paddingAngle={5}
                         >
-                            {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={`oklch(from var(--color-primary) l c h / ${1 - index * 0.1})`} />
+                            {pieData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                         </Pie>
-                        <Tooltip content={<CommonTooltip />} />
-                        <Legend />
+                        <Tooltip />
                     </PieChart>
                 </ResponsiveContainer>
             )
@@ -95,27 +96,75 @@ export function TrendGraph() {
                         <XAxis dataKey="date" tick={{ fontSize: 12, fill: 'var(--color-text-muted)' }} tickLine={false} axisLine={false} tickMargin={10} />
                         <YAxis tick={{ fontSize: 12, fill: 'var(--color-text-muted)' }} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} tickMargin={10} />
                         <Tooltip content={<CommonTooltip />} cursor={{ fill: 'var(--color-surface-muted)' }} />
-                        <Bar dataKey="amount" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
+                        {/* Unstacked Bars side-by-side for comparison */}
+                        <Bar dataKey="received" name="Received" fill="#16A34A" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="sent" name="Sent" fill="#EF4444" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             )
         }
 
         // Default Line (Area)
+        // Need to calculate Total for the chart rendering
+        const chartData = data.map(point => ({
+            ...point,
+            total: point.sent + point.received
+        }));
+
         return (
             <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data}>
+                <AreaChart data={chartData}>
                     <defs>
-                        <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} /> {/* Blue-500 */}
+                            <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorSent" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} /> {/* Red-500 */}
+                            <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorReceived" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#16A34A" stopOpacity={0.3} /> {/* Green-600 */}
+                            <stop offset="95%" stopColor="#16A34A" stopOpacity={0} />
                         </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
                     <XAxis dataKey="date" tick={{ fontSize: 12, fill: 'var(--color-text-muted)' }} tickLine={false} axisLine={false} tickMargin={10} />
                     <YAxis tick={{ fontSize: 12, fill: 'var(--color-text-muted)' }} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} tickMargin={10} />
                     <Tooltip content={<CommonTooltip />} />
-                    <Area type="monotone" dataKey="amount" stroke="var(--color-primary)" fillOpacity={1} fill="url(#colorAmount)" strokeWidth={2} />
+
+                    {/* Total (Blue) - Render first so it's behind others */}
+                    <Area
+                        type="monotone"
+                        dataKey="total"
+                        name="Total"
+                        stroke="#3B82F6"
+                        fillOpacity={1}
+                        fill="url(#colorTotal)"
+                        strokeWidth={2}
+                    />
+
+                    {/* Received (Green) */}
+                    <Area
+                        type="monotone"
+                        dataKey="received"
+                        name="Received"
+                        stroke="#16A34A"
+                        fillOpacity={1}
+                        fill="url(#colorReceived)"
+                        strokeWidth={2}
+                    />
+
+                    {/* Sent (Red) */}
+                    <Area
+                        type="monotone"
+                        dataKey="sent"
+                        name="Sent"
+                        stroke="#EF4444"
+                        fillOpacity={1}
+                        fill="url(#colorSent)"
+                        strokeWidth={2}
+                    />
                 </AreaChart>
             </ResponsiveContainer>
         );

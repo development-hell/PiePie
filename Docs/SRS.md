@@ -101,8 +101,11 @@ The application is divided into two distinct zones with specific layouts:
 *   **Dashboard**:
     *   **Financial Overview**: High-level stats (Total Sent, Total Received, Pending Actions).
     *   **Trend Analysis**: Interactive graph (Line/Bar/Pie) illustrating spending history over time (7d, 30d, 90d, 1y).
+        *   **Visuals**: Multi-line graph showing **Total**, **Sent**, and **Received** flows.
         *   **Filters**: View 'All', 'Sent', 'Received', 'My Requests' (Owned), or 'Others Requests' (Not Owned).
     *   **Activity Feed**: Unified chronological stream of recent transactions.
+*   **Performance**:
+    *   **Client-Side Caching**: Route data (Contacts, Graphs) is cached via **TanStack Query** (5-minute stale time) to minimize API requests and enable instant navigation.
 
 ### 3.3 Data Inputs/Outputs
 *   **Inputs**: User credentials, transaction amounts, dates, descriptions, split details.
@@ -129,7 +132,7 @@ The application is divided into two distinct zones with specific layouts:
 | :--- | :--- | :--- | :--- |
 | **Backend** | **Python (>=3.13)** | `uv` | Modern runtime. |
 | **API Framework** | **Django (>=6.0)** & **DRF** | `simplejwt`, `Pillow` | **Django Rest Framework** for API. `simplejwt` for Auth. |
-| **Frontend** | **React.js (^19.2.0)** | **Vite (^7.2.4)** | TypeScript (~5.9.3), Tailwind CSS v4. **Recharts** for graphs. |
+| **Frontend** | **React.js (^19.2.0)** | **Vite (^7.2.4)** | TypeScript (~5.9.3), Tailwind CSS v4. **Recharts** for graphs. **TanStack Query** for caching. |
 | **Database** | **PostgreSQL** | - | Required for complex relationship modeling. |
 | **Mobile** | **React Native** | - | Future target, sharing logic with web. |
 

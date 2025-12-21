@@ -1,5 +1,16 @@
 # Changelog
 
+## [2025-12-21 19:25] feat(dashboard): implement triple-line trend graph and update SRS
+**Summary:** Enhanced the Dashboard Trend Graph to display three distinct lines: Total (Blue), Sent (Red), and Received (Green), enabling users to see net volume alongside incoming/outgoing flows. The areas are unstacked for clearer comparison. Also updated the SRS to include TanStack Query in the tech stack (preparing for caching implementation) and refined the graph specifications.
+**Frontend Changes:**
+* `src/features/Dashboard/components/TrendGraph.tsx`: [Feat] Implemented 3-line visualization. Added client-side calculation for 'Total'. Updated `AreaChart`, `BarChart`, and `PieChart` colors and labels.
+* `src/features/Dashboard/api.ts`: [Refactor] Updated `GraphPoint` interface to match new API response structure.
+**Backend Changes:**
+* `backend/ledger/views.py`: [Refactor] Updated `graph_data` endpoint to aggregation logic to return distinct `sent` and `received` sums per day.
+**Documentation:**
+* `Docs/SRS.md`: Added "TanStack Query" to Tech Stack. Updated "Trend Analysis" to specify Triple-Line Graph. Added "Client-Side Caching" to features.
+
+
 ## [2025-12-20 19:44] feat(contacts): design detailed contact profile page
 **Summary:** Transformed the placeholder `ContactDetailPage.tsx` into a rich profile view. Features include a visual header with avatar/navigation, a "Quick Actions" bar, a relationship stats grid (Shared History, Last Interaction), and a chronologically ordered "Recent Activity" feed derived from chat messages. Also updated all documentation (SRS, READMEs) to reflect these new capabilities.
 **Frontend Changes:**

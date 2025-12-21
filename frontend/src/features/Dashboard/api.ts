@@ -9,7 +9,8 @@ export interface DashboardStats {
 
 export interface GraphPoint {
     date: string;
-    amount: number;
+    sent: number;
+    received: number;
 }
 
 export interface GraphParams {

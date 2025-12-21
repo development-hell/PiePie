@@ -284,10 +284,24 @@ class DashboardViewSet(viewsets.ViewSet):
             queryset = queryset.filter(Q(payer=user) | Q(recipient=user))
 
         # 4. Aggregation by Date
-        # We want a list of { date: 'YYYY-MM-DD', amount: X }
-        # TruncDate is useful here.
+        # Use conditional aggregation to separate Sent (outgoing) vs Received (incoming)
+        data = (
+            queryset.annotate(date=TruncDate("created_at"))
+            .values("date")
+            .annotate(
+                sent=Sum("amount", filter=Q(payer=user)),
+                received=Sum("amount", filter=Q(recipient=user)),
+            )
+            .order_by("date")
+        )
 
-        data = queryset.annotate(date=TruncDate("created_at")).values("date").annotate(amount=Sum("amount")).order_by("date")
+        # Handle None values (if no txns for a day match the filter)
+        result = []
+        for entry in data:
+            result.append({
+                "date": entry["date"],
+                "sent": entry["sent"] or 0,
+                "received": entry["received"] or 0,
+            })
 
-        # Limit valid return format
-        return Response(list(data))
+        return Response(result)
