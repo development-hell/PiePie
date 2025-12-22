@@ -5,6 +5,9 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q, Sum
 from django.db.models.functions import TruncDate
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -40,7 +43,16 @@ class ChatViewSet(viewsets.ViewSet):
         # Python set filtering is easier for MVP.
 
         start_msgs = (
-            Message.objects.filter(Q(sender=user) | Q(recipient=user)).select_related("sender", "recipient", "transaction").order_by("-created_at")
+            Message.objects.filter(Q(sender=user) | Q(recipient=user))
+            .select_related(
+                "sender",
+                "recipient",
+                "transaction",
+                "transaction__payer",
+                "transaction__recipient",
+                "transaction__created_by",
+            )
+            .order_by("-created_at")[:50]
         )
 
         chats = []
@@ -70,7 +82,12 @@ class ChatViewSet(viewsets.ViewSet):
 
         # Base Query
         msgs = Message.objects.filter((Q(sender=user) & Q(recipient=other_user)) | (Q(sender=other_user) & Q(recipient=user))).select_related(
-            "transaction", "sender", "recipient"
+            "transaction",
+            "sender",
+            "recipient",
+            "transaction__payer",
+            "transaction__recipient",
+            "transaction__created_by",
         )
 
         # Polling: If 'after' is provided, we just want everything NEWER than that
@@ -199,6 +216,8 @@ class ChatViewSet(viewsets.ViewSet):
 class DashboardViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
+    @method_decorator(cache_page(60 * 1))
+    @method_decorator(vary_on_headers("Authorization"))
     @action(detail=False, methods=["get"])
     def stats(self, request):
         """
@@ -237,7 +256,7 @@ class DashboardViewSet(viewsets.ViewSet):
         # All transactions involving user
         recent_txns = (
             Transaction.objects.filter(Q(payer=user) | Q(recipient=user))
-            .select_related("payer", "recipient", "created_by")
+            .select_related("payer", "recipient", "created_by", "message")
             .order_by("-created_at")[:10]
         )
 
@@ -245,6 +264,8 @@ class DashboardViewSet(viewsets.ViewSet):
 
         return Response(TransactionSerializer(recent_txns, many=True).data)
 
+    @method_decorator(cache_page(60 * 1))
+    @method_decorator(vary_on_headers("Authorization"))
     @action(detail=False, methods=["get"])
     def graph_data(self, request):
         """
@@ -298,7 +319,10 @@ class DashboardViewSet(viewsets.ViewSet):
         # 5. Fill Empty Dates
         # Create a dict of {date: {sent: 0, received: 0}} for the full range
         date_map = {}
-        current_date = data[0]["date"]
+        try:
+            current_date = data[0]["date"]
+        except IndexError:
+            current_date = start_date.date()
         end_date = now.date()
 
         while current_date <= end_date:

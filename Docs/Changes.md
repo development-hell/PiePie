@@ -1,5 +1,30 @@
 # Changelog
 
+## [2025-12-22 23:38] perf(app): comprehensive backend/frontend optimizations
+**Summary:** Implemented a full suite of performance optimizations. Backend: Fixed N+1 queries (`recent_chats`, `messages`, `activity`), added query limits, implemented Dashboard caching (60s TTL, user-scoped), enabled `GZipMiddleware`, and configured persistent DB connections (`CONN_MAX_AGE`). Frontend: Implemented Lazy Loading (Code Splitting) for all pages, lazy-loaded the heavy `TrendGraph` component, and memoized `MessageBubble` to improve list rendering.
+**Backend Changes:**
+* `backend/ledger/views.py`: Fixed N+1 queries using `select_related`. Added `[:500]` limit to `recent_chats`. Implemented `@cache_page` with `vary_on_headers('Authorization')` for Dashboard stats.
+* `backend/core/views.py`: Fixed N+1 in `ContactViewSet`.
+* `backend/config/settings.py`: Enabled `GZipMiddleware`, configured `LocMemCache`, and set `CONN_MAX_AGE=600`.
+**Frontend Changes:**
+* `src/App.tsx`: Implemented `React.lazy` and `Suspense` for all routes.
+* `src/features/Dashboard/pages/DashboardPage.tsx`: Lazy loaded `TrendGraph` component.
+* `src/features/Chat/components/MessageBubble.tsx`: Memoized using `React.memo`.
+* `src/features/Chat/components/ChatWindow.tsx`: Cleaned up unused imports.
+
+## [2025-12-22 01:47] perf(backend): optimize db queries to prevent N+1
+**Summary:** Optimized `ChatViewSet` and `DashboardViewSet` queries by adding proper `select_related` and `prefetch_related` calls. This significantly reduces the number of database roundtrips when fetching recent chats, message history, and dashboard activity.
+**Back Changes:**
+* `backend/ledger/views.py`: Optimized `recent_chats`, `messages`, and `activity` endpoints. Added `[:500]` limit to `recent_chats` to prevent full history scan. Implemented **Caching** for `DashboardViewSet.stats` and `graph_data` (60s TTL).
+* `backend/config/settings.py`: Configured `LocMemCache` and enabled `GZipMiddleware` for response compression.
+* `backend/core/views.py`: Optimized `ContactViewSet` query.
+
+**Frontend Changes:**
+* `src/features/Chat/components/MessageBubble.tsx`: Memoized component to improve list rendering performance.
+* `src/features/Chat/components/ChatWindow.tsx`: Cleaned up unused imports.
+* `src/App.tsx`: Implemented Lazy Loading (Code Splitting) for all pages.
+* `src/features/Dashboard/pages/DashboardPage.tsx`: Lazy Loaded `TrendGraph` component to improve initial dashboard rendering.
+
 ## [2025-12-22 01:29] feat(ui): implement click-outside-to-close for transaction modal
 **Summary:** The `TransactionDetailsModal` now listens for clicks on the backdrop overlay to close the modal, adhering to standard UI patterns and improving user convenience.
 **Frontend Changes:**

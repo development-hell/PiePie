@@ -1,7 +1,7 @@
 import { NotFoundState } from "@/components/States/NotFoundState";
 import type { User } from "@/features/Auth/types";
 import { useChatMessages } from "@/features/Chat/hooks/useChatMessages";
-import { ArrowLeft, Home, LayoutDashboard, Loader2, MoreVertical, UserIcon, UserX } from "lucide-react";
+import { ArrowLeft, Loader2, MoreVertical, UserX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ChatWindowContent } from "./ChatWindowContent"; // Import the Presenter
 

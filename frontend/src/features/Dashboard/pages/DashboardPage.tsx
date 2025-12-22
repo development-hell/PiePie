@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { dashboardApi, type DashboardStats } from "../api";
 import { type Transaction } from "@/features/Chat/types";
 import { StatsOverview } from "../components/StatsOverview";
 import { ActivityFeed } from "../components/ActivityFeed";
-import { TrendGraph } from "../components/TrendGraph";
+// Lazy Load Graph (Heavy Recharts dependency)
+const TrendGraph = lazy(() => import("../components/TrendGraph").then(m => ({ default: m.TrendGraph })));
 import { useAuth } from "@/features/Auth/context/AuthContext";
+import { Loader2 } from "lucide-react";
 
 export function DashboardPage() {
     const { user } = useAuth();
@@ -49,7 +51,13 @@ export function DashboardPage() {
 
                     {/* Graph (Takes up 2 cols) */}
                     <div className="lg:col-span-2 min-h-[400px]">
-                        <TrendGraph />
+                        <Suspense fallback={
+                            <div className="bg-surface border border-border rounded-2xl h-full flex items-center justify-center">
+                                <Loader2 className="w-8 h-8 animate-spin text-primary/50" />
+                            </div>
+                        }>
+                            <TrendGraph />
+                        </Suspense>
                     </div>
 
                     {/* Feed (Takes up 1 col) */}

@@ -3,14 +3,14 @@ import { chatApi } from "@/features/Chat/api";
 import type { Message, Transaction } from "@/features/Chat/types";
 import { cn } from "@/lib/utils";
 import { ArrowDownLeft, ArrowUpRight, CheckCircle2, Clock, Loader2, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 
 interface MessageBubbleProps {
     message: Message;
     onTransactionClick?: (transaction: Transaction) => void;
 }
 
-export function MessageBubble({ message, onTransactionClick }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message, onTransactionClick }: MessageBubbleProps) {
     const { user } = useAuth();
     const isMe = message.sender.username === user?.username;
     const isTransaction = !!message.transaction;
@@ -154,4 +154,4 @@ export function MessageBubble({ message, onTransactionClick }: MessageBubbleProp
             </div>
         </div>
     );
-}
+});

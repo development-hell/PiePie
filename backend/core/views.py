@@ -37,7 +37,7 @@ class ContactViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Contact.objects.filter(user=self.request.user, is_deleted=False)
+        return Contact.objects.filter(user=self.request.user, is_deleted=False).select_related("contact")
 
     def get_serializer_class(self):
         if self.action == "create":
